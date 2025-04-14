@@ -79,6 +79,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
                 style={{
                   color: isFocused ? colors.primary : colors.text,
                   fontSize: 14,
+                  paddingLeft: 4,
                   textAlign: "center",
                 }}
               >
