@@ -6,13 +6,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
 
 export default function RegisterScreen() {
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,6 @@ export default function RegisterScreen() {
     try {
       setLoading(true);
       await createUserWithEmailAndPassword(auth, email, password);
-      // ❌ router.replace("/") kaldırıldı!
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -30,66 +29,78 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Full Name"
-        value={fullName}
-        onChangeText={setFullName}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email Address"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? "Creating..." : "Sign Up"}</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.or}>or</Text>
-
-      <View style={styles.socialRow}>
-        {/* <Image source={require('../../assets/google.png')} style={styles.icon} /> */}
-        {/* <Image source={require('../../assets/apple.png')} style={styles.icon} /> */}
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Create Account</Text>
+        {/* İstersen buraya illüstrasyon resmi koyabilirsin */}
+        {/* <Image source={require('../../assets/signup.png')} style={styles.image} /> */}
       </View>
 
-      <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-        <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginLink}>Login</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.formArea}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email Address"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? "Creating..." : "Sign Up"}</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.or}>or</Text>
+
+        <View style={styles.socialRow}>
+          {/* <Image source={require('../../assets/google.png')} style={styles.icon} /> */}
+          {/* <Image source={require('../../assets/apple.png')} style={styles.icon} /> */}
+        </View>
+
+        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+          <Text style={styles.loginText}>
+            Already have an account? <Text style={styles.loginLink}>Login</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+    flexGrow: 1,
+    backgroundColor: "#7B5EFF",
   },
-  title: {
+  header: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 60,
+  },
+  headerText: {
+    color: "#fff",
     fontSize: 28,
     fontWeight: "bold",
-    color: "#333",
-    alignSelf: "center",
-    marginBottom: 24,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginTop: 20,
+  },
+  formArea: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 24,
+    flex: 1,
   },
   input: {
     backgroundColor: "#F5F5F5",
