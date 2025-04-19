@@ -29,7 +29,8 @@ export default function RootLayout() {
   return (
     <Stack
       screenOptions={{
-        animation: "slide_from_right", // Basit animasyon burada!
+        animation: "slide_from_right",
+        headerShown: false, // 🔥 HEADER'ı buradan tamamen kapattık!
       }}
     />
   );

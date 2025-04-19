@@ -1,22 +1,16 @@
 import {
   View,
-  Platform,
   StyleSheet,
-  Touchable,
   TouchableOpacity,
 } from "react-native";
 import { useLinkBuilder, useTheme } from "@react-navigation/native";
-import { Text, PlatformPressable } from "@react-navigation/elements";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import Animated, {
   FadeIn,
   FadeOut,
   LinearTransition,
 } from "react-native-reanimated";
-import { Feather } from "@expo/vector-icons";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -35,14 +29,13 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
-        //Hide Side Map and NotFound
-        console.log("route:", route);
-        if (["_sitemap", "+not-found", "upload-image"].includes(route.name)) return null;
+        if (["_sitemap", "+not-found", "upload-image"].includes(route.name))
+          return null;
 
         const { options } = descriptors[route.key];
-        const label = options.tabBarLabel ?? options.title ?? route.name;
-
         const isFocused = state.index === index;
+
+        const label = options.title ?? route.name;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -72,7 +65,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
               route.name,
               isFocused ? PRIMARY_COLOR : SECONDARY_COLOR
             )}
-            {isFocused && (
+            {isFocused && label && (
               <Animated.Text
                 entering={FadeIn.duration(200)}
                 exiting={FadeOut.duration(200)}
@@ -83,7 +76,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
                   textAlign: "center",
                 }}
               >
-                {label as string}
+                {label}
               </Animated.Text>
             )}
           </AnimatedTouchableOpacity>
@@ -127,7 +120,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowRadius: 5,
   },
-
   tabItem: {
     flexDirection: "row",
     height: 36,
@@ -135,10 +127,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 12,
     borderRadius: 30,
-  },
-  text: {
-    color: PRIMARY_COLOR,
-    marginLeft: 8,
   },
 });
 

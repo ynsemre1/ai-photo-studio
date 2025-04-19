@@ -4,7 +4,7 @@ import React from 'react'
 export default function car() {
   return (
     <View>
-      <Text>style</Text>
+      <Text>Car</Text>
     </View>
   )
 }
