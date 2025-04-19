@@ -37,7 +37,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
       {state.routes.map((route, index) => {
         //Hide Side Map and NotFound
         console.log("route:", route);
-        if (["_sitemap", "+not-found"].includes(route.name)) return null;
+        if (["_sitemap", "+not-found", "upload-image"].includes(route.name)) return null;
 
         const { options } = descriptors[route.key];
         const label = options.tabBarLabel ?? options.title ?? route.name;

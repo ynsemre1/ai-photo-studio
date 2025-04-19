@@ -19,12 +19,12 @@ const data = [
   {
     id: "3",
     uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
+    value: "styleC",
   },
   {
     id: "4",
     uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
+    value: "styleD",
   },
   {
     id: "5",
@@ -52,7 +52,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const handlePress = (value: string) => {
-    router.push({ pathname: "/style-detail", params: { value } });
+    router.push({ pathname: "/upload-image", params: { value } });
   };
 
   return (
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
   gridContainer: {
     paddingVertical: 16,
     paddingHorizontal: 8,
-    justifyContent: "center", // önemli!
-    alignItems: "center", // önemli!
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
