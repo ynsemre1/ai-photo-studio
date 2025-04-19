@@ -1,8 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { signOut } from 'firebase/auth';
-import { auth } from '../../src/firebase/config';
-import { router } from 'expo-router';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Image,
+} from "react-native";
+import { signOut } from "firebase/auth";
+import { auth } from "../../src/firebase/config";
+import { router } from "expo-router";
 
 export default function ProfileScreen() {
   const handleLogout = async () => {
@@ -23,7 +31,13 @@ export default function ProfileScreen() {
 
       <View style={styles.content}>
         <Text style={styles.infoLabel}>Welcome, User 👋</Text>
-
+        <View style={styles.coinRow}>
+          <Image
+            source={require("../../src/assets/coin.png")}
+            style={styles.coinIcon}
+          />
+          <Text style={styles.coinText}>8 Coins</Text>
+        </View>
         <TouchableOpacity style={styles.button} onPress={handleLogout}>
           <Text style={styles.buttonText}>Log Out</Text>
         </TouchableOpacity>
@@ -70,5 +84,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
+  },
+  coinRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 30,
+  },
+  
+  coinIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 8,
+  },
+  
+  coinText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
   },
 });
