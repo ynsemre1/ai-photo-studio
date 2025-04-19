@@ -18,7 +18,7 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
-const AniamtedTouchableOpacitiy =
+const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 
 const PRIMARY_COLOR = "#130057";
@@ -57,7 +57,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
         };
 
         return (
-          <AniamtedTouchableOpacitiy
+          <AnimatedTouchableOpacity
             layout={LinearTransition.springify().mass(0.5)}
             key={route.key}
             accessibilityState={isFocused ? { selected: true } : {}}
@@ -86,7 +86,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
                 {label as string}
               </Animated.Text>
             )}
-          </AniamtedTouchableOpacitiy>
+          </AnimatedTouchableOpacity>
         );
       })}
     </View>

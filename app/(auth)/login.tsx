@@ -1,26 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Image,
   ScrollView,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Switch } from "react-native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadRememberedData = async () => {
+      const savedEmail = await AsyncStorage.getItem("email");
+      const savedPassword = await AsyncStorage.getItem("password");
+
+      if (savedEmail && savedPassword) {
+        setEmail(savedEmail);
+        setPassword(savedPassword);
+        setRememberMe(true);
+      }
+    };
+    loadRememberedData();
+  }, []);
 
   const handleLogin = async () => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
+
+      if (rememberMe) {
+        await AsyncStorage.setItem("email", email);
+        await AsyncStorage.setItem("password", password);
+      } else {
+        await AsyncStorage.removeItem("email");
+        await AsyncStorage.removeItem("password");
+      }
+
+      setTimeout(() => {
+        router.replace("/");
+      }, 100);
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -32,7 +60,6 @@ export default function LoginScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Welcome Back</Text>
-        {/* <Image source={require('../../assets/login.png')} style={styles.image} /> */}
       </View>
 
       <View style={styles.formArea}>
@@ -53,24 +80,38 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
+        <View style={styles.checkboxRow}>
+          <Switch
+            value={rememberMe}
+            onValueChange={setRememberMe}
+            trackColor={{ false: "#ccc", true: "#7B5EFF" }}
+            thumbColor={rememberMe ? "#FFD700" : "#f4f3f4"}
+          />
+          <Text style={styles.checkboxLabel}>Beni Hatırla</Text>
+        </View>
+
         <TouchableOpacity style={styles.forgotPassword}>
           <Text style={styles.forgotText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? "Loading..." : "Login"}</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Loading..." : "Login"}
+          </Text>
         </TouchableOpacity>
 
         <Text style={styles.or}>or</Text>
 
-        <View style={styles.socialRow}>
-          {/* <Image source={require('../../assets/google.png')} style={styles.icon} /> */}
-          {/* <Image source={require('../../assets/apple.png')} style={styles.icon} /> */}
-        </View>
+        <View style={styles.socialRow}></View>
 
         <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
           <Text style={styles.registerText}>
-            Don’t have an account? <Text style={styles.registerLink}>Sign Up</Text>
+            Don’t have an account?{" "}
+            <Text style={styles.registerLink}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -93,11 +134,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
   },
-  image: {
-    width: 200,
-    height: 200,
-    marginTop: 20,
-  },
   formArea: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 30,
@@ -110,6 +146,16 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     marginBottom: 16,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: "#333",
   },
   forgotPassword: {
     alignSelf: "flex-end",
@@ -142,11 +188,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 16,
     marginBottom: 20,
-  },
-  icon: {
-    width: 32,
-    height: 32,
-    marginHorizontal: 10,
   },
   registerText: {
     color: "#444",

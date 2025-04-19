@@ -2,6 +2,7 @@ import { Slot, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -25,5 +26,11 @@ export default function RootLayout() {
 
   if (loading) return null;
 
-  return <Slot />;
+  return (
+    <Stack
+      screenOptions={{
+        animation: "slide_from_right", // Basit animasyon burada!
+      }}
+    />
+  );
 }
