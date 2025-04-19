@@ -1,7 +1,7 @@
 import React from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import StyleBox from "../src/components/StyleBox";
+import StyleBox from "../../src/components/StyleBox";
 
 const data = [
   //TODO: uri change with Firebase Storage
