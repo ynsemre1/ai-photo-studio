@@ -12,6 +12,8 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
 
+//TODO: coin will connect to firebase
+
 export default function ProfileScreen() {
   const handleLogout = async () => {
     try {

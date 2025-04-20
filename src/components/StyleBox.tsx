@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
+//TODO: favorites(star icon) will add
+
 const screenWidth = Dimensions.get('window').width;
 const boxSize = (screenWidth - 48) / 2;
 
