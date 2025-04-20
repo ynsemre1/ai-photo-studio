@@ -17,7 +17,9 @@ export default function StyleScreen() {
     //TODO: reusability and maintainability.
 
     //TODO: Need to add loading indicator
-    
+
+    // TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)   
+     
     const fetchStyles = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "styles"));
