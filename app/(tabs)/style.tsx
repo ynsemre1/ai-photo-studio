@@ -18,7 +18,7 @@ export default function StyleScreen() {
 
     //TODO: Need to add loading indicator
 
-    // TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)   
+    //TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)   
      
     const fetchStyles = async () => {
       try {
