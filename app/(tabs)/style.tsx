@@ -11,6 +11,13 @@ export default function StyleScreen() {
   >([]);
 
   useEffect(() => {
+    
+    //TODO: This function will be reused in three different places. 
+    //TODO: Consider extracting it into a separate .tsx component for better 
+    //TODO: reusability and maintainability.
+
+    //TODO: Need to add loading indicator
+    
     const fetchStyles = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "styles"));
