@@ -18,16 +18,20 @@ export default function StyleScreen() {
 
   useEffect(() => {
     const fetchStyles = async () => {
-      const querySnapshot = await getDocs(collection(db, "styles"));
-      const results = await Promise.all(
-        querySnapshot.docs.map(async (doc) => {
-          const value = doc.data().value;
-          const imageRef = ref(storage, `styles/${value}.png`);
-          const uri = await getDownloadURL(imageRef);
-          return { id: doc.id, value, uri };
-        })
-      );
-      setStylesData(results);
+      try {
+        const querySnapshot = await getDocs(collection(db, "styles"));
+        const results = await Promise.all(
+          querySnapshot.docs.map(async (doc) => {
+            const filename = doc.data().filename;
+            const imageRef = ref(storage, `styles/${filename}.png`);
+            const uri = await getDownloadURL(imageRef); // ⚠️ burada fail olabilir
+            return { id: doc.id, value: doc.data().value, uri };
+          })
+        );
+        setStylesData(results);
+      } catch (error) {
+        console.error("🔥 fetchStyles error:", error);
+      }
     };
 
     fetchStyles();
