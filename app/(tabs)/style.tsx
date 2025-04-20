@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, FlatList, StyleSheet } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 import { db, storage } from "../../src/firebase/config";
+import StyleBox from "../../src/components/StyleBox";
 
 export default function StyleScreen() {
   const [stylesData, setStylesData] = useState<
@@ -24,7 +18,7 @@ export default function StyleScreen() {
           querySnapshot.docs.map(async (doc) => {
             const filename = doc.data().filename;
             const imageRef = ref(storage, `styles/${filename}.png`);
-            const uri = await getDownloadURL(imageRef); // ⚠️ burada fail olabilir
+            const uri = await getDownloadURL(imageRef);
             return { id: doc.id, value: doc.data().value, uri };
           })
         );
@@ -37,53 +31,32 @@ export default function StyleScreen() {
     fetchStyles();
   }, []);
 
-  const renderItem = ({
-    item,
-  }: {
-    item: { id: string; value: string; uri: string };
-  }) => (
-    <TouchableOpacity style={styles.itemBox}>
-      <Image source={{ uri: item.uri }} style={styles.itemImage} />
-      <Text style={styles.itemText}>{item.value}</Text>
-    </TouchableOpacity>
-  );
+  const handlePress = (value: string) => {
+    // 👇 Fotoğraf tıklanınca yapılacak işlem (yönlendirme vs)
+    console.log("Clicked style value:", value);
+  };
 
   return (
     <View style={styles.container}>
       <FlatList
         data={stylesData}
+        renderItem={({ item }) => (
+          <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+        )}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={styles.gridContainer}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 12,
-  },
-  listContent: {
-    paddingBottom: 16,
-  },
-  itemBox: {
-    flex: 1,
-    margin: 8,
-    borderRadius: 12,
-    overflow: "hidden",
-    backgroundColor: "#f0f0f0",
-  },
-  itemImage: {
-    width: "100%",
-    height: 150,
-  },
-  itemText: {
-    textAlign: "center",
-    padding: 8,
-    fontWeight: "600",
+  container: { flex: 1 },
+  gridContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
