@@ -1,11 +1,22 @@
 import React, { useState } from "react";
-import { View, Text, Button, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
+import { editPhoto } from "../utils/editPhoto";
+import { getAuth } from "firebase/auth";
 
 export default function UploadImageScreen() {
   const { value } = useLocalSearchParams<{ value: string }>();
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [originalUri, setOriginalUri] = useState<string | null>(null);
+  const [generatedUri, setGeneratedUri] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -13,25 +24,59 @@ export default function UploadImageScreen() {
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+    if (!result.canceled && result.assets?.length > 0) {
+      setOriginalUri(result.assets[0].uri);
+      setGeneratedUri(null);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!originalUri || !value) return;
+    setLoading(true);
+
+    try {
+      const blob = await fetch(originalUri).then((r) => r.blob());
+      const uid = getAuth().currentUser?.uid || "anon";
+      console.log("👤 UID:", uid); // 🔥 burada logla!
+
+      const resultUrl = await editPhoto(blob, value, uid);
+      setGeneratedUri(resultUrl);
+    } catch (err) {
+      console.log("🔥 Üretim hatası:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Fotoğraf Yükle</Text>
-      <Text style={styles.testText}>Seçilen Stil: {value}</Text>
+      <Text style={styles.testText}>Prompt: {value}</Text>
 
+      {/* 1️⃣ Orijinal Görsel */}
       <View style={styles.previewBox}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.image} />
+        {originalUri ? (
+          <Image source={{ uri: originalUri }} style={styles.image} />
         ) : (
           <Text style={styles.placeholderText}>Henüz fotoğraf seçilmedi</Text>
         )}
       </View>
 
-      <Button title="Fotoğraf Seç" onPress={pickImage} />
+      {/* 2️⃣ Üretilen Görsel */}
+      <View style={styles.previewBox}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#999" />
+        ) : generatedUri ? (
+          <Image source={{ uri: generatedUri }} style={styles.image} />
+        ) : (
+          <Text style={styles.placeholderText}>Henüz sonuç yok</Text>
+        )}
+      </View>
+
+      <View style={styles.buttonGroup}>
+        <Button title="Fotoğraf Seç" onPress={pickImage} />
+        <Button title="Fotoğrafı Yükle" onPress={handleUpload} disabled={!originalUri} />
+      </View>
     </View>
   );
 }
@@ -62,5 +107,11 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     color: "#888",
+  },
+  buttonGroup: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 20,
   },
 });
