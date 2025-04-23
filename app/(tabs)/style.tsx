@@ -4,22 +4,23 @@ import { collection, getDocs } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
 import { db, storage } from "../../src/firebase/config";
 import StyleBox from "../../src/components/StyleBox";
+import { useRouter } from "expo-router";
+
 
 export default function StyleScreen() {
+  const router = useRouter();
+
   const [stylesData, setStylesData] = useState<
     { id: string; value: string; uri: string }[]
   >([]);
 
   useEffect(() => {
-    
-    //TODO: This function will be reused in three different places. 
-    //TODO: Consider extracting it into a separate .tsx component for better 
+    //TODO: This function will be reused in three different places.
+    //TODO: Consider extracting it into a separate .tsx component for better
     //TODO: reusability and maintainability.
-
     //TODO: Need to add loading indicator
+    //TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)
 
-    //TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)   
-     
     const fetchStyles = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "styles"));
@@ -41,8 +42,7 @@ export default function StyleScreen() {
   }, []);
 
   const handlePress = (value: string) => {
-    // 👇 Fotoğraf tıklanınca yapılacak işlem (yönlendirme vs)
-    console.log("Clicked style value:", value);
+    router.push({ pathname: "/upload-image", params: { value } });
   };
 
   return (
