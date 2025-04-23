@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { View, FlatList, StyleSheet, Text } from "react-native";
 import { getDownloadURL, ref } from "firebase/storage";
 import { storage } from "../../src/firebase/config";
 import { useRouter } from "expo-router";
@@ -14,22 +14,38 @@ export default function ProfessionalScreen() {
   >([]);
 
   useEffect(() => {
+    console.log("🧩 Gelen professional verisi:", styleData?.professional);
+
     const fetch = async () => {
-      if (!styleData) return;
+      if (!styleData || styleData.professional.length === 0) {
+        console.log("⚠️ Professional context boş ya da veri yok");
+        return;
+      }
 
       const list = await Promise.all(
         styleData.professional.map(async (item, index) => {
-          const path = `styles/professional/${item.filename}`;
-          const uri = await getDownloadURL(ref(storage, path));
-          return {
-            id: `pro-${index}`,
-            uri,
-            value: item.value,
-          };
+          try {
+            const path = `styles/professional/${item.filename}`;
+            console.log("📁 Storage yolu:", path);
+            const uri = await getDownloadURL(ref(storage, path));
+            console.log("✅ URL:", uri);
+            return {
+              id: `pro-${index}`,
+              uri,
+              value: item.value,
+            };
+          } catch (err) {
+            console.log("🚫 getDownloadURL hatası:", item.filename, err);
+            return {
+              id: `pro-${index}`,
+              uri: "",
+              value: item.value,
+            };
+          }
         })
       );
 
-      setProfessionalList(list);
+      setProfessionalList(list.filter((item) => item.uri !== ""));
     };
 
     fetch();
@@ -41,15 +57,19 @@ export default function ProfessionalScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={professionalList}
-        renderItem={({ item }) => (
-          <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
-        )}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.gridContainer}
-      />
+      {professionalList.length === 0 ? (
+        <Text style={{ marginTop: 40 }}>⏳ Yükleniyor...</Text>
+      ) : (
+        <FlatList
+          data={professionalList}
+          renderItem={({ item }) => (
+            <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+          )}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.gridContainer}
+        />
+      )}
     </View>
   );
 }
