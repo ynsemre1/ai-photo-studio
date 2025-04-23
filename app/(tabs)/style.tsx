@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
-import { collection, getDocs } from "firebase/firestore";
 import { getDownloadURL, ref } from "firebase/storage";
-import { db, storage } from "../../src/firebase/config";
+import { storage } from "../../src/firebase/config";
 import StyleBox from "../../src/components/StyleBox";
 import { useRouter } from "expo-router";
-
+import { useStyleData } from "../../src/context/StyleDataProvider";
 
 export default function StyleScreen() {
   const router = useRouter();
-
+  const styleData = useStyleData();
   const [stylesData, setStylesData] = useState<
     { id: string; value: string; uri: string }[]
   >([]);
@@ -21,25 +20,26 @@ export default function StyleScreen() {
     //TODO: Need to add loading indicator
     //TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)
 
-    const fetchStyles = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "styles"));
-        const results = await Promise.all(
-          querySnapshot.docs.map(async (doc) => {
-            const filename = doc.data().filename;
-            const imageRef = ref(storage, `styles/${filename}.png`);
-            const uri = await getDownloadURL(imageRef);
-            return { id: doc.id, value: doc.data().value, uri };
-          })
-        );
-        setStylesData(results);
-      } catch (error) {
-        console.error("🔥 fetchStyles error:", error);
-      }
+    const fetchUrls = async () => {
+      if (!styleData) return;
+
+      const list = await Promise.all(
+        styleData.style.map(async (item, index) => {
+          const path = `styles/style/${item.filename}`;
+          const uri = await getDownloadURL(ref(storage, path));
+          return {
+            id: `style-${index}`,
+            uri,
+            value: item.value,
+          };
+        })
+      );
+
+      setStylesData(list);
     };
 
-    fetchStyles();
-  }, []);
+    fetchUrls();
+  }, [styleData]);
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } });
