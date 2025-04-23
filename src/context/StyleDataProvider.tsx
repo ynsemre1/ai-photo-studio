@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { db, storage } from "../firebase/config";
 import { getAuth } from "firebase/auth";
+import { getDownloadURL, ref } from "firebase/storage";
 
-type StyleItem = { filename: string; value: string };
+type StyleItem = { filename: string; value: string; uri: string };
 type StyleData = {
   style: StyleItem[];
   car: StyleItem[];
@@ -14,11 +15,7 @@ type StyleData = {
 const StyleContext = createContext<StyleData | null>(null);
 export const useStyleData = () => useContext(StyleContext);
 
-export const StyleDataProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const StyleDataProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<StyleData>({
     style: [],
     car: [],
@@ -27,37 +24,51 @@ export const StyleDataProvider = ({
 
   const fetchFromFirestore = async (): Promise<StyleData> => {
     const types = ["style", "car", "professional"] as const;
-    const results: any = {};
+    const results: Record<string, StyleItem[]> = {};
 
     for (const type of types) {
       console.log("🔥 Fetching from Firestore:", type);
-      const ref = collection(db, type);
-      console.log("📁 Collection Ref:", ref.path);
+      const refCol = collection(db, type);
+      const snap = await getDocs(refCol);
 
-      const snap = await getDocs(ref);
-      console.log("✅ DOC COUNT:", snap.size);
+      const enrichedData = await Promise.all(
+        snap.docs.map(async (doc) => {
+          const data = doc.data();
+          const path = `styles/${type}/${data.filename}`;
+          try {
+            const uri = await getDownloadURL(ref(storage, path));
+            return { ...data, uri } as StyleItem;
+          } catch (err) {
+            console.log("🚫 URI alınamadı:", path);
+            return null;
+          }
+        })
+      );
 
-      results[type] = snap.docs.map((doc) => doc.data()) as StyleItem[];
+      results[type] = enrichedData.filter(Boolean) as StyleItem[];
     }
 
-    return results;
+    return results as StyleData;
   };
 
   useEffect(() => {
     (async () => {
       try {
+        const uid = getAuth().currentUser?.uid;
+        if (!uid) return;
+
         const cached = await AsyncStorage.getItem("styleData");
         if (cached) {
           console.log("CACHE VAR");
           setData(JSON.parse(cached));
         } else {
-          console.log("FIRESTORE'DAN ÇEKİYORUM");
+          console.log("FIRESTORE + STORAGE ÇEKİLİYOR...");
           const fresh = await fetchFromFirestore();
           await AsyncStorage.setItem("styleData", JSON.stringify(fresh));
           setData(fresh);
         }
       } catch (err) {
-        console.log("🔥 HATA:", err);
+        console.log("🔥 CACHE/FIRESTORE/STORAGE HATASI:", err);
       }
     })();
   }, []);

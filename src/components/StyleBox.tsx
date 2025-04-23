@@ -1,9 +1,14 @@
-import React from 'react';
-import { View, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 
-//TODO: favorites(star icon) will add
-
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 const boxSize = (screenWidth - 48) / 2;
 
 type Props = {
@@ -13,9 +18,22 @@ type Props = {
 };
 
 export default function StyleBox({ uri, value, onPress }: Props) {
+  const [loading, setLoading] = useState(true);
+
   return (
     <TouchableOpacity onPress={() => onPress(value)} style={styles.item}>
-      <Image source={{ uri }} style={styles.image} />
+      <View style={styles.imageWrapper}>
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="small" color="#999" />
+          </View>
+        )}
+        <Image
+          source={{ uri }}
+          style={styles.image}
+          onLoadEnd={() => setLoading(false)}
+        />
+      </View>
     </TouchableOpacity>
   );
 }
@@ -26,11 +44,22 @@ const styles = StyleSheet.create({
     height: boxSize,
     margin: 8,
     borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#eee',
+    overflow: "hidden",
+    backgroundColor: "#eee",
+  },
+  imageWrapper: {
+    width: "100%",
+    height: "100%",
+    position: "relative",
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#eee",
   },
 });
