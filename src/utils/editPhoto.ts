@@ -1,7 +1,8 @@
 import { storage, functions } from "../firebase/config";
 import { ref, uploadBytes } from "firebase/storage";
 import { httpsCallable } from "firebase/functions";
-import { saveGeneratedImage } from "../utils/saveGeneratedImage"; // 🔥 ekledik
+import { saveGeneratedImage } from "./saveGeneratedImage"; // ✅ local kayıt fonksiyonu
+import { getAuth } from "firebase/auth";
 
 /**
  * @param file    raw image picked from gallery / camera (Blob)
@@ -25,7 +26,7 @@ export async function editPhoto(
 
   const { generatedUrl } = response.data as { generatedUrl: string };
 
-  const localUri = await saveGeneratedImage(generatedUrl);
+  const localUri = await saveGeneratedImage(generatedUrl, uid);
 
   return localUri;
 }

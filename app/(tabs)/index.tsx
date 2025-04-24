@@ -16,6 +16,7 @@ import { useStyleData } from "../../src/context/StyleDataProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
 import { useFocusEffect } from "@react-navigation/native";
+import { getAuth } from "firebase/auth";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -30,7 +31,8 @@ export default function HomeScreen() {
   useFocusEffect(
     React.useCallback(() => {
       (async () => {
-        const images = await getRecentGeneratedImages();
+        const uid = getAuth().currentUser?.uid || "anon";
+        const images = await getRecentGeneratedImages(uid);
         setRecentImages(images);
       })();
     }, [])

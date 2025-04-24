@@ -6,6 +6,7 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
@@ -48,7 +49,7 @@ export default function UploadImageScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Fotoğraf Yükle</Text>
       <Text style={styles.testText}>Prompt: {value}</Text>
 
@@ -76,13 +77,12 @@ export default function UploadImageScreen() {
         <Button title="Fotoğraf Seç" onPress={pickImage} />
         <Button title="Fotoğrafı Yükle" onPress={handleUpload} disabled={!originalUri} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
     alignItems: "center",
     backgroundColor: "#fff",
