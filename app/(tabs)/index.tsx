@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Image,
+  Modal,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import StyleBox, { boxSize } from "../../src/components/StyleBox";
 import { useFavorites } from "../../src/context/FavoriteContext";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import { Ionicons } from "@expo/vector-icons";
+import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -19,6 +24,17 @@ export default function HomeScreen() {
 
   const [showFavorites, setShowFavorites] = useState(true);
   const [showAllStyles, setShowAllStyles] = useState(true);
+  const [recentImages, setRecentImages] = useState<string[]>([]);
+  const [previewUri, setPreviewUri] = useState<string | null>(null);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      (async () => {
+        const images = await getRecentGeneratedImages();
+        setRecentImages(images);
+      })();
+    }, [])
+  );
 
   if (!styleData) return null;
 
@@ -40,6 +56,37 @@ export default function HomeScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      {/* Son Üretilenler */}
+      <TouchableOpacity style={styles.sectionHeader}>
+        <Text style={styles.header}>Son Üretilenler</Text>
+      </TouchableOpacity>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.horizontalList}
+      >
+        {recentImages.map((uri) => (
+          <TouchableOpacity key={uri} onPress={() => setPreviewUri(uri)}>
+            <Image source={{ uri }} style={styles.previewImage} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Modal Önizleme */}
+      <Modal visible={!!previewUri} transparent animationType="fade">
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setPreviewUri(null)}
+        >
+          <Image
+            source={{ uri: previewUri! }}
+            style={styles.modalImage}
+            resizeMode="contain"
+          />
+        </Pressable>
+      </Modal>
+
+      {/* Favoriler */}
       <TouchableOpacity
         style={styles.sectionHeader}
         onPress={() => setShowFavorites((prev) => !prev)}
@@ -72,6 +119,7 @@ export default function HomeScreen() {
         <View style={{ height: 16 }} />
       )}
 
+      {/* Tüm Stiller */}
       <TouchableOpacity
         style={styles.sectionHeader}
         onPress={() => setShowAllStyles((prev) => !prev)}
@@ -131,5 +179,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 8,
     paddingBottom: 16,
+  },
+  previewImage: {
+    width: boxSize,
+    height: boxSize,
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalImage: {
+    width: "90%",
+    height: "90%",
+    borderRadius: 16,
   },
 });
