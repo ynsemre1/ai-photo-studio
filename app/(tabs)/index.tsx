@@ -58,7 +58,6 @@ export default function HomeScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      {/* Son Üretilenler */}
       {recentImages.length > 0 && (
         <>
           <TouchableOpacity style={styles.sectionHeader}>
@@ -78,7 +77,6 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* Modal Önizleme */}
       <Modal visible={!!previewUri} transparent animationType="fade">
         <Pressable
           style={styles.modalOverlay}
@@ -92,7 +90,6 @@ export default function HomeScreen() {
         </Pressable>
       </Modal>
 
-      {/* Favoriler */}
       {favoriteItems.length > 0 && (
         <>
           <TouchableOpacity
@@ -129,7 +126,6 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* Tüm Stiller */}
       <TouchableOpacity
         style={styles.sectionHeader}
         onPress={() => setShowAllStyles((prev) => !prev)}
