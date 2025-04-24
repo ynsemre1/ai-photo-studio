@@ -59,20 +59,24 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Son Üretilenler */}
-      <TouchableOpacity style={styles.sectionHeader}>
-        <Text style={styles.header}>Son Üretilenler</Text>
-      </TouchableOpacity>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.horizontalList}
-      >
-        {recentImages.map((uri) => (
-          <TouchableOpacity key={uri} onPress={() => setPreviewUri(uri)}>
-            <Image source={{ uri }} style={styles.previewImage} />
+      {recentImages.length > 0 && (
+        <>
+          <TouchableOpacity style={styles.sectionHeader}>
+            <Text style={styles.header}>Son Üretilenler</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.horizontalList}
+          >
+            {recentImages.map((uri) => (
+              <TouchableOpacity key={uri} onPress={() => setPreviewUri(uri)}>
+                <Image source={{ uri }} style={styles.previewImage} />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </>
+      )}
 
       {/* Modal Önizleme */}
       <Modal visible={!!previewUri} transparent animationType="fade">
@@ -89,36 +93,40 @@ export default function HomeScreen() {
       </Modal>
 
       {/* Favoriler */}
-      <TouchableOpacity
-        style={styles.sectionHeader}
-        onPress={() => setShowFavorites((prev) => !prev)}
-      >
-        <Text style={styles.header}>Favoriler</Text>
-        <Ionicons
-          name={showFavorites ? "chevron-up" : "chevron-down"}
-          size={20}
-          color="#333"
-        />
-      </TouchableOpacity>
+      {favoriteItems.length > 0 && (
+        <>
+          <TouchableOpacity
+            style={styles.sectionHeader}
+            onPress={() => setShowFavorites((prev) => !prev)}
+          >
+            <Text style={styles.header}>Favoriler</Text>
+            <Ionicons
+              name={showFavorites ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="#333"
+            />
+          </TouchableOpacity>
 
-      {showFavorites ? (
-        <View style={styles.horizontalList}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {favoriteItems.map((item) =>
-              item ? (
-                <StyleBox
-                  key={item.value}
-                  uri={item.uri}
-                  value={item.value}
-                  onPress={handlePress}
-                  size={boxSize}
-                />
-              ) : null
-            )}
-          </ScrollView>
-        </View>
-      ) : (
-        <View style={{ height: 16 }} />
+          {showFavorites ? (
+            <View style={styles.horizontalList}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {favoriteItems.map((item) =>
+                  item ? (
+                    <StyleBox
+                      key={item.value}
+                      uri={item.uri}
+                      value={item.value}
+                      onPress={handlePress}
+                      size={boxSize}
+                    />
+                  ) : null
+                )}
+              </ScrollView>
+            </View>
+          ) : (
+            <View style={{ height: 16 }} />
+          )}
+        </>
       )}
 
       {/* Tüm Stiller */}
