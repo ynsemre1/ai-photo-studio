@@ -1,96 +1,133 @@
-import React from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
-import StyleBox from "../../src/components/StyleBox";
-
-const data = [
-  //TODO: uri change with Firebase Storage
-  //TODO: this holder will change to style
-  {
-    id: "1",
-    uri: "https://plus.unsplash.com/premium_photo-1731951687921-4b2029496c98?q=80&w=3115&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleA",
-  },
-  {
-    id: "2",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
-  },
-  {
-    id: "3",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleC",
-  },
-  {
-    id: "4",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleD",
-  },
-  {
-    id: "5",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
-  },
-  {
-    id: "6",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
-  },
-  {
-    id: "7",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
-  },
-  {
-    id: "8",
-    uri: "https://images.unsplash.com/photo-1741762764258-8f9348bdf186?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    value: "styleB",
-  },
-];
+import StyleBox, { boxSize } from "../../src/components/StyleBox";
+import { useFavorites } from "../../src/context/FavoriteContext";
+import { useStyleData } from "../../src/context/StyleDataProvider";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { favorites } = useFavorites();
+  const styleData = useStyleData();
+
+  const [showFavorites, setShowFavorites] = useState(true);
+  const [showAllStyles, setShowAllStyles] = useState(true);
+
+  if (!styleData) return null;
+
+  const allStyles = [
+    ...styleData.style,
+    ...styleData.car,
+    ...styleData.professional,
+  ];
+
+  const favoriteItems = favorites
+    .map((value) => allStyles.find((item) => item.value === value))
+    .filter(Boolean)
+    .slice(-5)
+    .reverse();
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } });
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => (
-          <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
-        )}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.gridContainer}
-      />
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <TouchableOpacity
+        style={styles.sectionHeader}
+        onPress={() => setShowFavorites((prev) => !prev)}
+      >
+        <Text style={styles.header}>Favoriler</Text>
+        <Ionicons
+          name={showFavorites ? "chevron-up" : "chevron-down"}
+          size={20}
+          color="#333"
+        />
+      </TouchableOpacity>
+
+      {showFavorites ? (
+        <View style={styles.horizontalList}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {favoriteItems.map((item) => (
+              <StyleBox
+                key={item!.value}
+                uri={item!.uri}
+                value={item!.value}
+                onPress={handlePress}
+                size={boxSize}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      ) : (
+        <View style={{ height: 16 }} />
+      )}
+
+      <TouchableOpacity
+        style={styles.sectionHeader}
+        onPress={() => setShowAllStyles((prev) => !prev)}
+      >
+        <Text style={styles.header}>Tüm Stiller</Text>
+        <Ionicons
+          name={showAllStyles ? "chevron-up" : "chevron-down"}
+          size={20}
+          color="#333"
+        />
+      </TouchableOpacity>
+
+      {showAllStyles ? (
+        <View style={styles.gridContainer}>
+          {allStyles.map((item) => (
+            <StyleBox
+              key={item.value}
+              uri={item.uri}
+              value={item.value}
+              onPress={handlePress}
+            />
+          ))}
+        </View>
+      ) : (
+        <View style={{ height: 16 }} />
+      )}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  gridContainer: {
-    paddingVertical: 16,
-    paddingHorizontal: 8,
-    justifyContent: "center",
+  scrollContainer: {
+    paddingTop: 20,
+    backgroundColor: "#fff",
+    paddingBottom: 40,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 16,
     alignItems: "center",
+    marginBottom: 8,
+  },
+  header: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  horizontalList: {
+    paddingLeft: 8,
+    paddingBottom: 16,
+    flexDirection: "row",
+  },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+    paddingBottom: 16,
   },
 });
-
-/*
-import { View, Text } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-
-export default function StyleDetail() {
-  const { value } = useLocalSearchParams<{ value: string }>();
-
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Gelen değer: {value}</Text>
-    </View>
-  );
-}
-*/

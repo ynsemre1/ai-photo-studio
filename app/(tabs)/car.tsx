@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CarScreen() {
   const router = useRouter();
@@ -14,26 +15,30 @@ export default function CarScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={carList}
-        renderItem={({ item, index }) => (
-          <StyleBox
-            uri={item.uri}
-            value={item.value}
-            onPress={handlePress}
-          />
-        )}
-        keyExtractor={(item, index) => `car-${index}`}
-        numColumns={2}
-        contentContainerStyle={styles.gridContainer}
-      />
-    </View>
+    <SafeAreaView style={styles.safeArea}> {/* 🧱 */}
+      <View style={styles.container}>
+        <FlatList
+          data={carList}
+          renderItem={({ item }) => (
+            <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+          )}
+          keyExtractor={(_, index) => `car-${index}`}
+          numColumns={2}
+          contentContainerStyle={styles.gridContainer}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff", // Arka planın boş kalmaması için
+  },
+  container: {
+    flex: 1,
+  },
   gridContainer: {
     paddingVertical: 16,
     paddingHorizontal: 8,

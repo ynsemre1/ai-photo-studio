@@ -7,21 +7,30 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { useFavorites } from "../context/FavoriteContext";
 
 const screenWidth = Dimensions.get("window").width;
-const boxSize = (screenWidth - 48) / 2;
+export const boxSize = (screenWidth - 48) / 2; // dışarıdan import edilebilir
 
 type Props = {
   uri: string;
   value: string;
   onPress: (value: string) => void;
+  size?: number;
 };
 
-export default function StyleBox({ uri, value, onPress }: Props) {
+export default function StyleBox({ uri, value, onPress, size }: Props) {
   const [loading, setLoading] = useState(true);
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  const finalSize = size ?? boxSize;
 
   return (
-    <TouchableOpacity onPress={() => onPress(value)} style={styles.item}>
+    <TouchableOpacity
+      onPress={() => onPress(value)}
+      style={[styles.item, { width: finalSize, height: finalSize }]}
+    >
       <View style={styles.imageWrapper}>
         {loading && (
           <View style={styles.loadingOverlay}>
@@ -33,6 +42,16 @@ export default function StyleBox({ uri, value, onPress }: Props) {
           style={styles.image}
           onLoadEnd={() => setLoading(false)}
         />
+        <TouchableOpacity
+          style={styles.starIcon}
+          onPress={() => toggleFavorite(value)}
+        >
+          <AntDesign
+            name={isFavorite(value) ? "star" : "staro"}
+            size={20}
+            color={isFavorite(value) ? "#FFD700" : "#fff"}
+          />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -40,8 +59,6 @@ export default function StyleBox({ uri, value, onPress }: Props) {
 
 const styles = StyleSheet.create({
   item: {
-    width: boxSize,
-    height: boxSize,
     margin: 8,
     borderRadius: 12,
     overflow: "hidden",
@@ -61,5 +78,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#eee",
+  },
+  starIcon: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    zIndex: 2,
   },
 });
