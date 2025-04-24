@@ -5,11 +5,7 @@ import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
 
 export default function StyleScreen() {
-  //TODO: This function will be reused in three different places.
-  //TODO: Consider extracting it into a separate .tsx component for better
-  //TODO: reusability and maintainability.
   //TODO: Need to add loading indicator
-  //TODO: Before opening style.tsx, search for cached data in IndexedDB (or local storage)
   const router = useRouter();
   const styleData = useStyleData();
   const styleList = styleData?.style || [];
