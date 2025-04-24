@@ -8,8 +8,6 @@ export default function TabsLayout() {
   return (
     <StyleDataProvider>
       <FavoriteProvider>
-        {" "}
-        {}
         <SafeAreaView style={{ flex: 1 }}>
           <Tabs
             tabBar={(props) => <CustomNavBar {...props} />}

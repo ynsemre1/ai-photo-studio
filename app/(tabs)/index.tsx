@@ -55,15 +55,17 @@ export default function HomeScreen() {
       {showFavorites ? (
         <View style={styles.horizontalList}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {favoriteItems.map((item) => (
-              <StyleBox
-                key={item!.value}
-                uri={item!.uri}
-                value={item!.value}
-                onPress={handlePress}
-                size={boxSize}
-              />
-            ))}
+            {favoriteItems.map((item) =>
+              item ? (
+                <StyleBox
+                  key={item.value}
+                  uri={item.uri}
+                  value={item.value}
+                  onPress={handlePress}
+                  size={boxSize}
+                />
+              ) : null
+            )}
           </ScrollView>
         </View>
       ) : (
