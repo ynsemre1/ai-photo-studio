@@ -37,7 +37,6 @@ export default function UploadImageScreen() {
     try {
       const blob = await fetch(originalUri).then((r) => r.blob());
       const uid = getAuth().currentUser?.uid || "anon";
-      console.log("👤 UID:", uid); // 🔥 burada logla!
 
       const resultUrl = await editPhoto(blob, value, uid);
       setGeneratedUri(resultUrl);
