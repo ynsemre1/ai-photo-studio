@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,44 +7,112 @@ import {
   Alert,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
-import { signOut } from "firebase/auth";
-import { auth } from "../../src/firebase/config";
-import { router } from "expo-router";
-
-//TODO: coin will connect to firebase
+import { signOut, getAuth } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../src/firebase/config";
+import { useFavorites } from "../../src/context/FavoriteContext";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const { favorites } = useFavorites();
+  const favoriteCount = favorites.length;
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      // yönlendirme yapma! app/_layout.tsx zaten yönlendirecek
     } catch (error: any) {
       Alert.alert("Logout Error", error.message);
     }
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Profile</Text>
-        {/* İstersen buraya avatar ekleriz */}
-      </View>
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          setUserInfo(snap.data());
+        }
+      } catch (err) {
+        console.log("🔥 Firestore kullanıcı verisi çekilemedi:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user]);
 
-      <View style={styles.content}>
-        <Text style={styles.infoLabel}>Welcome, User 👋</Text>
-        <View style={styles.coinRow}>
-          <Image
-            source={require("../../src/assets/coin.png")}
-            style={styles.coinIcon}
-          />
-          <Text style={styles.coinText}>8 Coins</Text>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={handleLogout}>
-          <Text style={styles.buttonText}>Log Out</Text>
-        </TouchableOpacity>
+  if (!user || loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#fff" />
       </View>
-    </ScrollView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#7B5EFF" }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.headerSection}>
+          <Text style={styles.username}>{userInfo?.username || ""}</Text>
+          <Text style={styles.email}>{userInfo?.email || user.email}</Text>
+        </View>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{userInfo?.coins || 0}</Text>
+            <Text style={styles.statLabel}>Coins</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{favoriteCount}</Text>
+            <Text style={styles.statLabel}>Favoriler</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>
+              {userInfo?.generatedCount || 0}
+            </Text>
+            <Text style={styles.statLabel}>Üretimler</Text>
+          </View>
+        </View>
+
+        <View style={styles.sectionCard}>
+          <Ionicons
+            name="settings-outline"
+            size={20}
+            color="#333"
+            style={styles.icon}
+          />
+          <Text style={styles.sectionText}>Ayarlar</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.sectionCard}
+          onPress={() => router.push("/profile/PrivacyScreen")}
+        >
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={20}
+            color="#333"
+            style={styles.icon}
+          />
+          <Text style={styles.sectionText}>Gizlilik Politikası</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Çıkış Yap</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -52,57 +120,81 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: "#7B5EFF",
+    alignItems: "center",
+    paddingBottom: 40,
   },
-  header: {
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#7B5EFF",
+  },
+  headerSection: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 60,
+    paddingVertical: 40,
   },
-  headerText: {
+  username: {
+    fontSize: 20,
+    fontWeight: "600",
     color: "#fff",
-    fontSize: 28,
-    fontWeight: "bold",
   },
-  content: {
+  email: {
+    fontSize: 14,
+    color: "#ddd",
+    marginTop: 4,
+  },
+  statsContainer: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 24,
-    flex: 1,
+    width: "90%",
+    borderRadius: 16,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 16,
+    marginVertical: 24,
   },
-  infoLabel: {
-    fontSize: 18,
-    color: "#333",
-    marginBottom: 40,
-    textAlign: "center",
-  },
-  button: {
-    backgroundColor: "#FFD700",
-    paddingVertical: 14,
-    borderRadius: 30,
+  statBox: {
     alignItems: "center",
   },
-  buttonText: {
+  statValue: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  statLabel: {
+    fontSize: 14,
+    color: "#777",
+    marginTop: 4,
+  },
+  sectionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    width: "90%",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    elevation: 2,
+  },
+  sectionText: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
+    color: "#333",
+    marginLeft: 12,
   },
-  coinRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  
-  coinIcon: {
+  icon: {
     width: 24,
     height: 24,
-    marginRight: 8,
   },
-  
-  coinText: {
+  logoutButton: {
+    marginTop: 24,
+    backgroundColor: "#FFD700",
+    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+  },
+  logoutText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#000",
   },
 });

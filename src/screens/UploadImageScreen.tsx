@@ -14,6 +14,8 @@ import { editPhoto } from "../utils/editPhoto";
 import { getAuth } from "firebase/auth";
 
 export default function UploadImageScreen() {
+  //TODO: Add a paint library for draw or edit the image
+  //TODO: UI improvements
   const { value } = useLocalSearchParams<{ value: string }>();
   const [originalUri, setOriginalUri] = useState<string | null>(null);
   const [generatedUri, setGeneratedUri] = useState<string | null>(null);
