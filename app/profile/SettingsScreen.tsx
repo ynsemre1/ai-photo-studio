@@ -10,13 +10,10 @@ import {
 import { getAuth } from "firebase/auth";
 import * as Application from "expo-application";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 export default function SettingsScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
-  const router = useRouter();
   const isSocialLogin = user?.providerData?.[0]?.providerId !== "password";
   const version =
     Application.nativeApplicationVersion || "Sürüm bilgisi bulunamadı";
@@ -47,66 +44,47 @@ export default function SettingsScreen() {
             </Text>
           ) : (
             <>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Parola Değiştir</Text>
+              <TouchableOpacity style={styles.buttonOutline}>
+                <Text style={styles.buttonOutlineText}>Parola Değiştir</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>E-posta Değiştir</Text>
+              <TouchableOpacity style={styles.buttonOutline}>
+                <Text style={styles.buttonOutlineText}>E-posta Değiştir</Text>
               </TouchableOpacity>
             </>
           )}
         </View>
 
-        {/* Settings & Privacy yan yana */}
-        <View style={styles.rowWrapper}>
-          <TouchableOpacity
-            style={[styles.sectionCard, styles.halfCard]}
-            onPress={() => router.push("/profile/SettingsScreen")}
-          >
-            <Ionicons
-              name="settings-outline"
-              size={20}
-              color="#333"
-              style={styles.icon}
-            />
-            <Text style={styles.sectionText}>Ayarlar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.sectionCard, styles.halfCard]}
-            onPress={() => router.push("/profile/PrivacyScreen")}
-          >
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={20}
-              color="#333"
-              style={styles.icon}
-            />
-            <Text style={styles.sectionText}>Gizlilik</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Uygulama */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Uygulama</Text>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Tema (Açık/Koyu Mod) [Mock]</Text>
+          <TouchableOpacity style={styles.buttonOutline}>
+            <Text style={styles.buttonOutlineText}>
+              Tema (Açık/Koyu Mod) [Mock]
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Gizlilik */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Gizlilik</Text>
-          <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
-            <Text style={[styles.buttonText, { color: "#b00020" }]}>Verilerimi Sil</Text>
+          <TouchableOpacity
+            style={styles.buttonOutline}
+            onPress={handleDeleteAccount}
+          >
+            <Text style={[styles.buttonOutlineText, { color: "red" }]}>
+              Verilerimi Sil
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Destek */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Destek</Text>
-          <TouchableOpacity style={styles.button} onPress={handleSupport}>
-            <Text style={styles.buttonText}>support@example.com</Text>
+          <TouchableOpacity
+            style={styles.buttonOutline}
+            onPress={handleSupport}
+          >
+            <Text style={styles.buttonOutlineText}>support@example.com</Text>
           </TouchableOpacity>
         </View>
 
@@ -137,70 +115,52 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 24,
-    backgroundColor: "#7B5EFF",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
   header: {
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#fff",
+    color: "#333",
     marginBottom: 32,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 12,
-    color: "#333",
+    color: "#444",
+  },
+  rowWrapper: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12, // React Native < 0.71 için paddingRight + marginLeft kullanabilirsin
+    flexWrap: "wrap",
+  },
+  halfCard: {
+    flex: 1,
+    maxWidth: "45%",
   },
   info: {
     fontSize: 14,
     color: "#555",
     lineHeight: 20,
   },
-  button: {
-    backgroundColor: "#FFD700",
+  buttonOutline: {
     paddingVertical: 14,
-    paddingHorizontal: 16,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
     marginBottom: 12,
-    alignItems: "center",
+    paddingHorizontal: 16,
   },
-  buttonText: {
+  buttonOutlineText: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  sectionCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 16,
-    elevation: 2,
-  },
-  sectionText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
     color: "#333",
-    marginLeft: 12,
-  },
-  icon: {
-    width: 24,
-    height: 24,
-  },
-  rowWrapper: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 20,
-  },
-  halfCard: {
-    flex: 1,
   },
 });

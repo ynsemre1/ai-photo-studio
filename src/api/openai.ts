@@ -15,5 +15,6 @@ export async function generateImage(prompt: string) {
   });
 
   const data = await response.json();
+  console.log(data);
   return data.data[0].url;
 }
