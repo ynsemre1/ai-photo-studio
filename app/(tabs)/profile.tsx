@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Dimensions,
 } from "react-native";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,7 +17,7 @@ import { useFavorites } from "../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import { Dimensions } from "react-native";
+import ImagePreviewModal from "../../src/components/ImagePreviewModal"; // ✅ Ekledik
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState<string[]>([]);
+  const [previewUri, setPreviewUri] = useState<string | null>(null); // ✅ State ekledik
   const { favorites } = useFavorites();
   const router = useRouter();
 
@@ -110,10 +112,19 @@ export default function ProfileScreen() {
         keyExtractor={(item, index) => index.toString()}
         numColumns={3}
         renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={styles.imageItem} />
+          <TouchableOpacity onPress={() => setPreviewUri(item)}>
+            <Image source={{ uri: item }} style={styles.imageItem} />
+          </TouchableOpacity>
         )}
         contentContainerStyle={styles.gridContainer}
         showsVerticalScrollIndicator={false}
+      />
+
+      {/* ✅ ImagePreviewModal ekledik */}
+      <ImagePreviewModal
+        visible={!!previewUri}
+        uri={previewUri!}
+        onClose={() => setPreviewUri(null)}
       />
     </SafeAreaView>
   );

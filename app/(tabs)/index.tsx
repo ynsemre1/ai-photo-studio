@@ -6,8 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Modal,
-  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import StyleBox, { boxSize } from "../../src/components/StyleBox";
@@ -17,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
+import ImagePreviewModal from "../../src/components/ImagePreviewModal"; // ✅ Bizim yeni modal
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -77,18 +76,12 @@ export default function HomeScreen() {
         </>
       )}
 
-      <Modal visible={!!previewUri} transparent animationType="fade">
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setPreviewUri(null)}
-        >
-          <Image
-            source={{ uri: previewUri! }}
-            style={styles.modalImage}
-            resizeMode="contain"
-          />
-        </Pressable>
-      </Modal>
+      {/* ✅ Bizim yeni modal'ı buraya ekliyoruz */}
+      <ImagePreviewModal
+        visible={!!previewUri}
+        uri={previewUri!}
+        onClose={() => setPreviewUri(null)}
+      />
 
       {favoriteItems.length > 0 && (
         <>
@@ -191,16 +184,5 @@ const styles = StyleSheet.create({
     height: boxSize,
     borderRadius: 12,
     marginRight: 8,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.9)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalImage: {
-    width: "90%",
-    height: "90%",
-    borderRadius: 16,
   },
 });

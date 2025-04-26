@@ -105,7 +105,7 @@ export default function UploadImageScreen() {
             </TouchableOpacity>
           </>
         ) : (
-          <Text style={styles.placeholderText}>Henüz sonuç yok</Text>
+          <Text style={styles.placeholderText}>Fotoğrafı Yollamak İçin Bas</Text>
         )}
       </TouchableOpacity>
     </ScrollView>
