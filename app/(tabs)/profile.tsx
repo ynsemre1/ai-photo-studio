@@ -16,6 +16,9 @@ import { useFavorites } from "../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { Dimensions } from "react-native";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function ProfileScreen() {
   const auth = getAuth();
@@ -43,7 +46,7 @@ export default function ProfileScreen() {
         const urls = await Promise.all(
           result.items.map((item) => getDownloadURL(item))
         );
-        setImages(urls);
+        setImages(urls.reverse());
       } catch (err) {
         console.log("🔥 Hata:", err);
       } finally {
@@ -68,39 +71,41 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <FlatList
-        ListHeaderComponent={
-          <View style={styles.headerContainer}>
-            <View style={styles.headerTop}>
-              <Text style={styles.username}>{userInfo?.username || ""}</Text>
-              <Text style={styles.email}>{userInfo?.email || user.email}</Text>
+      <View style={styles.headerContainer}>
+        <View style={styles.headerTop}>
+          <Text style={styles.username}>
+            {userInfo?.username || "Yunus Emre[MOCK]"}
+          </Text>
+          <Text style={styles.email}>{userInfo?.email || user.email}</Text>
 
-              <TouchableOpacity
-                style={styles.menuButton}
-                onPress={handleGoSettings}
-              >
-                <Ionicons name="menu" size={28} color="#fff" />
-              </TouchableOpacity>
-            </View>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={handleGoSettings}
+          >
+            <Ionicons name="menu" size={28} color="#fff" />
+          </TouchableOpacity>
+        </View>
 
-            <View style={styles.statsCard}>
-              <View style={styles.statBox}>
-                <Text style={styles.statValue}>{userInfo?.coins || 0}</Text>
-                <Text style={styles.statLabel}>Coins</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statValue}>{favorites.length}</Text>
-                <Text style={styles.statLabel}>Favoriler</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statValue}>
-                  {userInfo?.generatedCount || 0}
-                </Text>
-                <Text style={styles.statLabel}>Üretimler</Text>
-              </View>
-            </View>
+        <View style={styles.statsCard}>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{userInfo?.coins || 0}</Text>
+            <Text style={styles.statLabel}>Coins</Text>
           </View>
-        }
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{favorites.length}</Text>
+            <Text style={styles.statLabel}>Favoriler</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>
+              {userInfo?.generatedCount || 0}
+            </Text>
+            <Text style={styles.statLabel}>Üretimler</Text>
+          </View>
+        </View>
+      </View>
+
+      <FlatList
+        style={styles.imagesList}
         data={images}
         keyExtractor={(item, index) => index.toString()}
         numColumns={3}
@@ -178,10 +183,13 @@ const styles = StyleSheet.create({
     padding: 2,
     paddingBottom: 100,
   },
-  imageItem: {
+  imagesList: {
     flex: 1,
-    aspectRatio: 1,
-    margin: 2,
+  },
+  imageItem: {
+    width: screenWidth / 3 - 6,
+    height: screenWidth / 3 - 6,
+    margin: 3,
     borderRadius: 8,
   },
 });
