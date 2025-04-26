@@ -92,8 +92,6 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
           exiting={BounceOutDown.duration(400)}
           style={styles.plusWrapper}
         >
-          {/* Arka plan çıkıntısı */}
-          <View style={styles.plusBase} />
           {/* Üstteki + simgesi */}
           <View style={styles.plusButton}>
             <Feather name="plus" size={32} color="#fff" />
@@ -149,19 +147,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     zIndex: 10,
     alignItems: "center",
-  },
-  plusBase: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "#fff",
-    position: "absolute",
-    top: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   plusButton: {
     width: 64,

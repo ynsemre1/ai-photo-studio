@@ -53,7 +53,7 @@ export default function UploadImageScreen() {
       <Text style={styles.title}>Fotoğraf Yükle</Text>
       <Text style={styles.testText}>Prompt: {value}</Text>
 
-      {/* 1️⃣ Orijinal Görsel */}
+      {/* Orijinal Görsel */}
       <TouchableOpacity style={styles.previewBox} onPress={pickImage} activeOpacity={0.8}>
         {originalUri ? (
           <Image source={{ uri: originalUri }} style={styles.image} />
@@ -62,7 +62,7 @@ export default function UploadImageScreen() {
         )}
       </TouchableOpacity>
 
-      {/* 2️⃣ Üretilen Görsel */}
+      {/* Üretilen Görsel */}
       <View style={styles.previewBox}>
         {loading ? (
           <ActivityIndicator size="large" color="#FFD700" />
