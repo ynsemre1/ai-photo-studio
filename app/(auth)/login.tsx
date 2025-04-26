@@ -12,12 +12,18 @@ import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Switch } from "react-native";
+import { useGoogleLogin } from "../../src/firebase/auth/googleLogin";
+import { loginWithApple } from "../../src/firebase/auth/appleLogin";
+import { FontAwesome } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const { promptAsync: promptGoogleLogin } = useGoogleLogin();
 
   useEffect(() => {
     const loadRememberedData = async () => {
@@ -54,6 +60,14 @@ export default function LoginScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    await promptGoogleLogin();
+  };
+
+  const handleAppleLogin = async () => {
+    await loginWithApple();
   };
 
   return (
@@ -106,12 +120,19 @@ export default function LoginScreen() {
 
         <Text style={styles.or}>or</Text>
 
-        <View style={styles.socialRow}></View>
+        <View style={styles.socialRow}>
+          <TouchableOpacity onPress={handleGoogleLogin} style={styles.socialButton}>
+            <FontAwesome name="google" size={24} color="#DB4437" />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={handleAppleLogin} style={styles.socialButton}>
+            <AntDesign name="apple1" size={24} color="#000" />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
           <Text style={styles.registerText}>
-            Don’t have an account?{" "}
-            <Text style={styles.registerLink}>Sign Up</Text>
+            Don’t have an account? <Text style={styles.registerLink}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -120,81 +141,20 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#7B5EFF",
-  },
-  header: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-  },
-  headerText: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "bold",
-  },
-  formArea: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 24,
-    flex: 1,
-  },
-  input: {
-    backgroundColor: "#F5F5F5",
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  checkboxLabel: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: "#333",
-  },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginBottom: 20,
-  },
-  forgotText: {
-    fontSize: 13,
-    color: "#888",
-    textDecorationLine: "underline",
-  },
-  button: {
-    backgroundColor: "#FFD700",
-    paddingVertical: 14,
-    borderRadius: 30,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  or: {
-    textAlign: "center",
-    marginVertical: 8,
-    color: "#888",
-  },
-  socialRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 16,
-    marginBottom: 20,
-  },
-  registerText: {
-    color: "#444",
-    textAlign: "center",
-  },
-  registerLink: {
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-  },
+  container: { flexGrow: 1, backgroundColor: "#7B5EFF" },
+  header: { alignItems: "center", justifyContent: "center", paddingVertical: 60 },
+  headerText: { color: "#fff", fontSize: 28, fontWeight: "bold" },
+  formArea: { backgroundColor: "#fff", borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 24, flex: 1 },
+  input: { backgroundColor: "#F5F5F5", padding: 14, borderRadius: 12, marginBottom: 16 },
+  checkboxRow: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
+  checkboxLabel: { marginLeft: 8, fontSize: 14, color: "#333" },
+  forgotPassword: { alignSelf: "flex-end", marginBottom: 20 },
+  forgotText: { fontSize: 13, color: "#888", textDecorationLine: "underline" },
+  button: { backgroundColor: "#FFD700", paddingVertical: 14, borderRadius: 30, alignItems: "center", marginBottom: 20 },
+  buttonText: { fontSize: 16, fontWeight: "600", color: "#000" },
+  or: { textAlign: "center", marginVertical: 8, color: "#888" },
+  socialRow: { flexDirection: "row", justifyContent: "center", gap: 16, marginBottom: 20 },
+  socialButton: { backgroundColor: "#F5F5F5", padding: 12, borderRadius: 12 },
+  registerText: { color: "#444", textAlign: "center" },
+  registerLink: { fontWeight: "bold", textDecorationLine: "underline" },
 });

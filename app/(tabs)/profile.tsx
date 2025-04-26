@@ -1,131 +1,115 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
-  Alert,
+  ActivityIndicator,
+  FlatList,
+  Image,
 } from "react-native";
 import { getAuth } from "firebase/auth";
-import * as Application from "expo-application";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { doc, getDoc } from "firebase/firestore";
+import { db, storage } from "../../src/firebase/config";
+import { useFavorites } from "../../src/context/FavoriteContext";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ref, listAll, getDownloadURL } from "firebase/storage";
 
-export default function SettingsScreen() {
+export default function ProfileScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [images, setImages] = useState<string[]>([]);
+  const { favorites } = useFavorites();
   const router = useRouter();
-  const isSocialLogin = user?.providerData?.[0]?.providerId !== "password";
-  const version =
-    Application.nativeApplicationVersion || "Sürüm bilgisi bulunamadı";
 
-  const handleDeleteAccount = () => {
-    Alert.alert("Bilgilendirme", "Veri silme özelliği henüz aktif değildir.");
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchData = async () => {
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          setUserInfo(snap.data());
+        }
+
+        const imagesRef = ref(storage, `generatedImages/${user.uid}`);
+        const result = await listAll(imagesRef);
+
+        const urls = await Promise.all(
+          result.items.map((item) => getDownloadURL(item))
+        );
+        setImages(urls);
+      } catch (err) {
+        console.log("🔥 Hata:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  const handleGoSettings = () => {
+    router.push("/profile/SettingsScreen");
   };
 
-  const handleSupport = () => {
-    Alert.alert(
-      "Destek",
-      "Lütfen support@example.com adresine e-posta gönderin."
+  if (!user || loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
     );
-  };
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.header}>Ayarlar</Text>
+      <FlatList
+        ListHeaderComponent={
+          <View style={styles.headerContainer}>
+            <View style={styles.headerTop}>
+              <Text style={styles.username}>{userInfo?.username || ""}</Text>
+              <Text style={styles.email}>{userInfo?.email || user.email}</Text>
 
-        {/* Hesap */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Hesap</Text>
-          {isSocialLogin ? (
-            <Text style={styles.info}>
-              Bu hesap bir Google/Apple hesabı ile oluşturulduğu için parola ve
-              e-posta değiştirilemez.
-            </Text>
-          ) : (
-            <>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>Parola Değiştir</Text>
+              <TouchableOpacity
+                style={styles.menuButton}
+                onPress={handleGoSettings}
+              >
+                <Ionicons name="menu" size={28} color="#fff" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button}>
-                <Text style={styles.buttonText}>E-posta Değiştir</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
+            </View>
 
-        {/* Settings & Privacy yan yana */}
-        <View style={styles.rowWrapper}>
-          <TouchableOpacity
-            style={[styles.sectionCard, styles.halfCard]}
-            onPress={() => router.push("/profile/SettingsScreen")}
-          >
-            <Ionicons
-              name="settings-outline"
-              size={20}
-              color="#333"
-              style={styles.icon}
-            />
-            <Text style={styles.sectionText}>Ayarlar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.sectionCard, styles.halfCard]}
-            onPress={() => router.push("/profile/PrivacyScreen")}
-          >
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={20}
-              color="#333"
-              style={styles.icon}
-            />
-            <Text style={styles.sectionText}>Gizlilik</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Uygulama */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Uygulama</Text>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Tema (Açık/Koyu Mod) [Mock]</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Gizlilik */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Gizlilik</Text>
-          <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
-            <Text style={[styles.buttonText, { color: "#b00020" }]}>Verilerimi Sil</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Destek */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Destek</Text>
-          <TouchableOpacity style={styles.button} onPress={handleSupport}>
-            <Text style={styles.buttonText}>support@example.com</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Hakkında */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Hakkında</Text>
-          <Text style={styles.info}>
-            Bu uygulama, kullanıcıların fotoğraflarına yaratıcı stiller ve
-            efektler uygulayarak farklı sonuçlar elde etmesini sağlayan bir
-            fotoğraf düzenleme aracıdır.
-          </Text>
-        </View>
-
-        {/* Sürüm */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Sürüm</Text>
-          <Text style={styles.info}>{version}</Text>
-        </View>
-      </ScrollView>
+            <View style={styles.statsCard}>
+              <View style={styles.statBox}>
+                <Text style={styles.statValue}>{userInfo?.coins || 0}</Text>
+                <Text style={styles.statLabel}>Coins</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statValue}>{favorites.length}</Text>
+                <Text style={styles.statLabel}>Favoriler</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statValue}>
+                  {userInfo?.generatedCount || 0}
+                </Text>
+                <Text style={styles.statLabel}>Üretimler</Text>
+              </View>
+            </View>
+          </View>
+        }
+        data={images}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={3}
+        renderItem={({ item }) => (
+          <Image source={{ uri: item }} style={styles.imageItem} />
+        )}
+        contentContainerStyle={styles.gridContainer}
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaView>
   );
 }
@@ -135,72 +119,69 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#7B5EFF",
   },
-  container: {
-    padding: 24,
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#7B5EFF",
   },
-  header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
+  headerContainer: {
+    backgroundColor: "#7B5EFF",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  headerTop: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+  },
+  username: {
+    fontSize: 20,
+    fontWeight: "600",
     color: "#fff",
-    marginBottom: 32,
   },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#333",
-  },
-  info: {
+  email: {
     fontSize: 14,
-    color: "#555",
-    lineHeight: 20,
+    color: "#ddd",
+    marginTop: 4,
   },
-  button: {
-    backgroundColor: "#FFD700",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    alignItems: "center",
+  menuButton: {
+    position: "absolute",
+    right: 0,
+    top: 0,
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-  },
-  sectionCard: {
+  statsCard: {
     flexDirection: "row",
-    alignItems: "center",
+    justifyContent: "space-around",
     backgroundColor: "#fff",
-    padding: 16,
     borderRadius: 16,
-    elevation: 2,
+    marginTop: 20,
+    marginHorizontal: 20,
+    paddingVertical: 16,
   },
-  sectionText: {
-    fontSize: 16,
-    fontWeight: "600",
+  statBox: {
+    alignItems: "center",
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: "bold",
     color: "#333",
-    marginLeft: 12,
   },
-  icon: {
-    width: 24,
-    height: 24,
+  statLabel: {
+    fontSize: 12,
+    color: "#777",
+    marginTop: 4,
   },
-  rowWrapper: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 20,
+  gridContainer: {
+    backgroundColor: "#7B5EFF",
+    padding: 2,
+    paddingBottom: 100,
   },
-  halfCard: {
+  imageItem: {
     flex: 1,
+    aspectRatio: 1,
+    margin: 2,
+    borderRadius: 8,
   },
 });
