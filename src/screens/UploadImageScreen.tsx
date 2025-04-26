@@ -7,12 +7,16 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { useLocalSearchParams } from "expo-router";
 import { editPhoto } from "../utils/editPhoto";
 import { getAuth } from "firebase/auth";
 import { Feather } from "@expo/vector-icons";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function UploadImageScreen() {
   const { value } = useLocalSearchParams<{ value: string }>();
@@ -22,12 +26,23 @@ export default function UploadImageScreen() {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
       quality: 1,
+      selectionLimit: 1,
     });
 
     if (!result.canceled && result.assets?.length > 0) {
-      setOriginalUri(result.assets[0].uri);
+      const croppedUri = result.assets[0].uri;
+
+      const resized = await ImageManipulator.manipulateAsync(
+        croppedUri,
+        [{ resize: { width: 1024, height: 1024 } }],
+        { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+      );
+
+      setOriginalUri(resized.uri);
       setGeneratedUri(null);
     }
   };
@@ -58,7 +73,11 @@ export default function UploadImageScreen() {
       <Text style={styles.title}>Fotoğraf Yükle</Text>
 
       {/* 1️⃣ Orijinal Görsel */}
-      <TouchableOpacity style={styles.previewBox} onPress={pickImage} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={styles.previewBox}
+        onPress={pickImage}
+        activeOpacity={0.8}
+      >
         {originalUri ? (
           <Image source={{ uri: originalUri }} style={styles.image} />
         ) : (
@@ -102,8 +121,8 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#fff" },
   previewBox: {
-    width: "100%",
-    height: 300,
+    width: screenWidth - 40,
+    height: screenWidth - 40,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#fff",
