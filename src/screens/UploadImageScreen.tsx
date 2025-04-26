@@ -12,6 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
 import { editPhoto } from "../utils/editPhoto";
 import { getAuth } from "firebase/auth";
+import { Feather } from "@expo/vector-icons";
 
 export default function UploadImageScreen() {
   const { value } = useLocalSearchParams<{ value: string }>();
@@ -48,12 +49,15 @@ export default function UploadImageScreen() {
     }
   };
 
+  const handleResetGenerated = () => {
+    setGeneratedUri(null);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Fotoğraf Yükle</Text>
-      <Text style={styles.testText}>Prompt: {value}</Text>
 
-      {/* Orijinal Görsel */}
+      {/* 1️⃣ Orijinal Görsel */}
       <TouchableOpacity style={styles.previewBox} onPress={pickImage} activeOpacity={0.8}>
         {originalUri ? (
           <Image source={{ uri: originalUri }} style={styles.image} />
@@ -62,24 +66,28 @@ export default function UploadImageScreen() {
         )}
       </TouchableOpacity>
 
-      {/* Üretilen Görsel */}
-      <View style={styles.previewBox}>
+      {/* 2️⃣ Üretilen Görsel */}
+      <TouchableOpacity
+        style={styles.previewBox}
+        onPress={!generatedUri && !loading ? handleUpload : undefined}
+        activeOpacity={0.8}
+      >
         {loading ? (
           <ActivityIndicator size="large" color="#FFD700" />
         ) : generatedUri ? (
-          <Image source={{ uri: generatedUri }} style={styles.image} />
+          <>
+            <Image source={{ uri: generatedUri }} style={styles.image} />
+            <TouchableOpacity
+              style={styles.refreshButton}
+              onPress={handleResetGenerated}
+              activeOpacity={0.8}
+            >
+              <Feather name="rotate-ccw" size={20} color="#fff" />
+            </TouchableOpacity>
+          </>
         ) : (
           <Text style={styles.placeholderText}>Henüz sonuç yok</Text>
         )}
-      </View>
-
-      <TouchableOpacity
-        style={[styles.uploadButton, !originalUri && styles.disabledButton]}
-        onPress={handleUpload}
-        disabled={!originalUri}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.uploadButtonText}>Fotoğrafı Yükle</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -93,7 +101,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#fff" },
-  testText: { fontSize: 16, marginBottom: 10, color: "#ddd" },
   previewBox: {
     width: "100%",
     height: 300,
@@ -104,6 +111,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    position: "relative",
   },
   image: {
     width: "100%",
@@ -113,20 +121,12 @@ const styles = StyleSheet.create({
     color: "#ddd",
     textAlign: "center",
   },
-  uploadButton: {
-    backgroundColor: "#FFD700",
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 30,
-    marginTop: 10,
-    alignItems: "center",
-  },
-  uploadButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  disabledButton: {
-    backgroundColor: "#ccc",
+  refreshButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "#00000050",
+    borderRadius: 20,
+    padding: 6,
   },
 });
