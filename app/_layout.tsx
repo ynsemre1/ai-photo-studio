@@ -1,9 +1,8 @@
-import { Slot, useRouter } from "expo-router";
+import { Slot, useRouter, Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
-import { Stack } from "expo-router";
-
+import { syncGeneratedImagesFromStorage } from "../src/utils/saveGeneratedImage";
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,8 +18,13 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (!loading && user === null) {
-      router.replace("/(auth)/welcome");
+    if (!loading) {
+      if (user === null) {
+        router.replace("/(auth)/welcome");
+      } else {
+        //Kullanıcı login olduysa sadece 1 defa Storage eşitlemesi yap
+        syncGeneratedImagesFromStorage(user.uid);
+      }
     }
   }, [loading, user]);
 

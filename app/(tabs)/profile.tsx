@@ -17,7 +17,8 @@ import { useFavorites } from "../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import ImagePreviewModal from "../../src/components/ImagePreviewModal"; // ✅ Ekledik
+import ImagePreviewModal from "../../src/components/ImagePreviewModal";
+import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -42,13 +43,9 @@ export default function ProfileScreen() {
           setUserInfo(snap.data());
         }
 
-        const imagesRef = ref(storage, `generatedImages/${user.uid}`);
-        const result = await listAll(imagesRef);
-
-        const urls = await Promise.all(
-          result.items.map((item) => getDownloadURL(item))
-        );
-        setImages(urls.reverse());
+        const localUris = await getRecentGeneratedImages(user.uid);
+        localUris.reverse();
+        setImages(localUris);
       } catch (err) {
         console.log("🔥 Hata:", err);
       } finally {

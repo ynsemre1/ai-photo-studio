@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
-import ImagePreviewModal from "../../src/components/ImagePreviewModal"; // ✅ Bizim yeni modal
+import ImagePreviewModal from "../../src/components/ImagePreviewModal";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -32,6 +32,7 @@ export default function HomeScreen() {
       (async () => {
         const uid = getAuth().currentUser?.uid || "anon";
         const images = await getRecentGeneratedImages(uid);
+        images.reverse();
         setRecentImages(images);
       })();
     }, [])
