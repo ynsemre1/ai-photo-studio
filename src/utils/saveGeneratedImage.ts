@@ -29,7 +29,7 @@ export const syncGeneratedImagesFromStorage = async (uid: string) => {
 
     const downloadPromises = result.items.map(async (item) => {
       const url = await getDownloadURL(item);
-      const filename = `img_${item.name}`; // Dosya adını koruyoruz
+      const filename = `img_${item.name}`;
       const localPath = LOCAL_DIR + filename;
 
       const fileExists = await FileSystem.getInfoAsync(localPath);
@@ -90,6 +90,5 @@ export const getRecentGeneratedImages = async (uid: string): Promise<string[]> =
   const storageKey = await getStorageKey(uid);
   const json = await AsyncStorage.getItem(storageKey);
   const list = json ? JSON.parse(json) : [];
-  console.log("🗂️ Local kayıtlı fotoğraf sayısı:", list.length);
-  return list;
+  return list.reverse();
 };

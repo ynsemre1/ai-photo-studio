@@ -44,7 +44,6 @@ export default function ProfileScreen() {
         }
 
         const localUris = await getRecentGeneratedImages(user.uid);
-        localUris.reverse();
         setImages(localUris);
       } catch (err) {
         console.log("🔥 Hata:", err);
