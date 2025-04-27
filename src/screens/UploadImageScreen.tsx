@@ -70,8 +70,6 @@ export default function UploadImageScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Fotoğraf Yükle</Text>
-
       {/* 1️⃣ Orijinal Görsel */}
       <TouchableOpacity
         style={styles.previewBox}
@@ -105,7 +103,9 @@ export default function UploadImageScreen() {
             </TouchableOpacity>
           </>
         ) : (
-          <Text style={styles.placeholderText}>Fotoğrafı Yollamak İçin Bas</Text>
+          <Text style={styles.placeholderText}>
+            Fotoğrafı Yollamak İçin Bas
+          </Text>
         )}
       </TouchableOpacity>
     </ScrollView>
