@@ -32,6 +32,7 @@ export default function HomeScreen() {
       (async () => {
         const uid = getAuth().currentUser?.uid || "anon";
         const images = await getRecentGeneratedImages(uid);
+        images.reverse();
         setRecentImages(images);
       })();
     }, [])

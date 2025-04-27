@@ -90,5 +90,5 @@ export const getRecentGeneratedImages = async (uid: string): Promise<string[]> =
   const storageKey = await getStorageKey(uid);
   const json = await AsyncStorage.getItem(storageKey);
   const list = json ? JSON.parse(json) : [];
-  return list.reverse();
+  return list;
 };
