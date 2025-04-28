@@ -1,41 +1,39 @@
-import { Slot, useRouter, Stack } from "expo-router";
+import { Slot, useRouter, usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
-import { syncGeneratedImagesFromStorage } from "../src/utils/saveGeneratedImage";
+
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      setLoading(false);
+      setReady(true);
     });
-
     return unsub;
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      if (user === null) {
+    if (!ready) return;
+
+    if (user) {
+      // ✅ Login oldun, auth ekranındaysan tabs'a at
+      if (pathname.startsWith("/(auth)")) {
+        router.replace("/");
+      }
+    } else {
+      // ✅ Logout oldun, tabs ekranındaysan welcome'a at
+      if (pathname === "/" || pathname.startsWith("/(tabs)")) {
         router.replace("/(auth)/welcome");
-      } else {
-        //Kullanıcı login olduysa sadece 1 defa Storage eşitlemesi yap
-        syncGeneratedImagesFromStorage(user.uid);
       }
     }
-  }, [loading, user]);
+  }, [ready, user, pathname]);
 
-  if (loading) return null;
+  if (!ready) return null;
 
-  return (
-    <Stack
-      screenOptions={{
-        animation: "slide_from_right",
-        headerShown: false,
-      }}
-    />
-  );
+  return <Slot />;
 }

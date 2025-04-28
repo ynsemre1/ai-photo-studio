@@ -57,7 +57,7 @@ export default function ProfileScreen() {
   }, [user]);
 
   const handleGoSettings = () => {
-    router.push("/profile/SettingsScreen");
+    router.push("/profileScreens/SettingsScreen");
   };
 
   if (!user || loading) {

@@ -35,6 +35,7 @@ export default function SettingsScreen() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      // ✅ Kullanıcı çıkış yaptıktan sonra doğrudan Welcome'a atla
       router.replace("/(auth)/welcome");
     } catch (error) {
       console.error("Logout Error:", error);
