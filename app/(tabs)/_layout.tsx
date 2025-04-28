@@ -10,20 +10,19 @@ export default function TabsLayout() {
       <FavoriteProvider>
         <SafeAreaView style={{ flex: 1 }}>
           <Tabs
-            initialRouteName="index"
             tabBar={(props) => <CustomNavBar {...props} />}
             screenOptions={{
               headerShown: false,
             }}
           >
-            <Tabs.Screen name="index" options={{ title: "Home" }} />
+            <Tabs.Screen name="home" options={{ title: "Home" }} />
             <Tabs.Screen name="style" options={{ title: "Style" }} />
             <Tabs.Screen name="car" options={{ title: "Car" }} />
             <Tabs.Screen
               name="professional"
               options={{ title: "Professional" }}
             />
-            <Tabs.Screen name="profile" options={{ title: "Profiles" }} />
+            <Tabs.Screen name="profileScreens" options={{ title: "Profile" }} />
           </Tabs>
         </SafeAreaView>
       </FavoriteProvider>

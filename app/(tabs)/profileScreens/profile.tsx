@@ -12,13 +12,13 @@ import {
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
-import { db, storage } from "../../src/firebase/config";
-import { useFavorites } from "../../src/context/FavoriteContext";
+import { db, storage } from "../../../src/firebase/config";
+import { useFavorites } from "../../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import ImagePreviewModal from "../../src/components/ImagePreviewModal";
-import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
+import ImagePreviewModal from "../../../src/components/ImagePreviewModal";
+import { getRecentGeneratedImages } from "../../../src/utils/saveGeneratedImage";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -57,7 +57,7 @@ export default function ProfileScreen() {
   }, [user]);
 
   const handleGoSettings = () => {
-    router.push("/profileScreens/SettingsScreen");
+    router.push("/profileScreens/settings");
   };
 
   if (!user || loading) {

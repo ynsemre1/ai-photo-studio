@@ -95,7 +95,7 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push("/profile/PrivacyScreen")}
+            onPress={() => router.push("/profileScreens/privacypolicy")}
           >
             <Ionicons
               name="shield-checkmark-outline"

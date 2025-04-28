@@ -28,7 +28,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   const isUploadImageScreen = currentRouteName === "upload-image";
 
   const renderTab = (route: any, index: number) => {
-    if (["_sitemap", "+not-found", "upload-image"].includes(route.name))
+    if (["_sitemap", "+not-found", "upload-image", "index"].includes(route.name))
       return null;
 
     const { options } = descriptors[route.key];
@@ -104,7 +104,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
 
 function getIconByRouteName(routeName: string, color: string) {
   switch (routeName) {
-    case "index":
+    case "home":
       return <Feather name="home" size={25} color={color} />;
     case "style":
       return <Ionicons name="color-palette-outline" size={25} color={color} />;
@@ -112,7 +112,7 @@ function getIconByRouteName(routeName: string, color: string) {
       return <Ionicons name="car-sport-outline" size={25} color={color} />;
     case "professional":
       return <Ionicons name="airplane-outline" size={25} color={color} />;
-    case "profile":
+    case "profileScreens":
       return <Feather name="user" size={25} color={color} />;
     default:
       return <Feather name="circle" size={25} color={color} />;
