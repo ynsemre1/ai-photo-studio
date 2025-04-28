@@ -3,6 +3,7 @@ import { Slot, useRouter, usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
+import { ThemeProvider } from "../src/context/ThemeContext";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -48,5 +49,9 @@ export default function RootLayout() {
 
   if (!ready) return null; // For the splash screen
 
-  return <Slot />;
+  return (
+    <ThemeProvider>
+      <Slot />
+    </ThemeProvider>
+  );
 }

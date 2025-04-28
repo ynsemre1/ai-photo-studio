@@ -1,28 +1,37 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function WelcomeScreen() {
-  console.log("👋 Welcome Screen is loaded"); 
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Let’s Get Started!</Text>
+    <View style={[styles.container, { backgroundColor: colors.primary[600] }]}>
+      <Text style={[styles.title, { color: colors.text.inverse }]}>
+        Let’s Get Started!
+      </Text>
+
       <Image
-        // source={{ uri: 'https://i.ibb.co/0CkFhFc/welcome.png' }} // Geçici görsel, istersen kendi çizimini koyarız
+        //TODO: welcome image
+        // source={{ uri: 'https://i.ibb.co/0CkFhFc/welcome.png' }}
         style={styles.image}
         resizeMode="contain"
       />
 
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
         onPress={() => router.push("/(auth)/register")}
       >
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={[styles.buttonText, { color: colors.text.primary }]}>
+          Sign Up
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-        <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginLink}>Login</Text>
+        <Text style={[styles.loginText, { color: colors.text.inverse }]}>
+          Already have an account?{" "}
+          <Text style={styles.loginLink}>Login</Text>
         </Text>
       </TouchableOpacity>
     </View>
@@ -32,7 +41,6 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#7B5EFF", // arka plan rengi
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
@@ -40,7 +48,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
     marginBottom: 30,
   },
   image: {
@@ -49,19 +56,16 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   button: {
-    backgroundColor: "#FFD700",
     paddingVertical: 14,
     paddingHorizontal: 50,
     borderRadius: 30,
     marginBottom: 20,
   },
   buttonText: {
-    color: "#000",
     fontSize: 16,
     fontWeight: "600",
   },
   loginText: {
-    color: "#fff",
     fontSize: 14,
   },
   loginLink: {
