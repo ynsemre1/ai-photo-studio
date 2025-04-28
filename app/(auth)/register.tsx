@@ -11,8 +11,11 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function RegisterScreen() {
+  const { colors } = useTheme();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,6 +24,7 @@ export default function RegisterScreen() {
     try {
       setLoading(true);
       await createUserWithEmailAndPassword(auth, email, password);
+      router.replace("/"); // Başarılı olunca anasayfa
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -29,17 +33,17 @@ export default function RegisterScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Create Account</Text>
-        {/* İstersen buraya illüstrasyon resmi koyabilirsin */}
+        <Text style={[styles.headerText, { color: colors.text.inverse }]}>Create Account</Text>
         {/* <Image source={require('../../assets/signup.png')} style={styles.image} /> */}
       </View>
 
-      <View style={styles.formArea}>
+      <View style={[styles.formArea, { backgroundColor: colors.surface[100] }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
           placeholder="Email Address"
+          placeholderTextColor={colors.text.secondary}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -47,18 +51,25 @@ export default function RegisterScreen() {
         />
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
           placeholder="Password"
+          placeholderTextColor={colors.text.secondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-          <Text style={styles.buttonText}>{loading ? "Creating..." : "Sign Up"}</Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
+          onPress={handleRegister}
+          disabled={loading}
+        >
+          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+            {loading ? "Creating..." : "Sign Up"}
+          </Text>
         </TouchableOpacity>
 
-        <Text style={styles.or}>or</Text>
+        <Text style={[styles.or, { color: colors.text.secondary }]}>or</Text>
 
         <View style={styles.socialRow}>
           {/* <Image source={require('../../assets/google.png')} style={styles.icon} /> */}
@@ -66,8 +77,11 @@ export default function RegisterScreen() {
         </View>
 
         <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.loginText}>
-            Already have an account? <Text style={styles.loginLink}>Login</Text>
+          <Text style={[styles.loginText, { color: colors.text.secondary }]}>
+            Already have an account?{" "}
+            <Text style={[styles.loginLink, { color: colors.primary.DEFAULT }]}>
+              Login
+            </Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -78,7 +92,6 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "#7B5EFF",
   },
   header: {
     alignItems: "center",
@@ -86,7 +99,6 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   headerText: {
-    color: "#fff",
     fontSize: 28,
     fontWeight: "bold",
   },
@@ -96,20 +108,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   formArea: {
-    backgroundColor: "#fff",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 24,
     flex: 1,
   },
   input: {
-    backgroundColor: "#F5F5F5",
     padding: 14,
     borderRadius: 12,
     marginBottom: 16,
   },
   button: {
-    backgroundColor: "#FFD700",
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: "center",
@@ -118,12 +127,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000",
   },
   or: {
     textAlign: "center",
     marginVertical: 8,
-    color: "#888",
   },
   socialRow: {
     flexDirection: "row",
@@ -137,7 +144,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   loginText: {
-    color: "#444",
     textAlign: "center",
   },
   loginLink: {

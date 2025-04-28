@@ -12,83 +12,83 @@
  * 12‑step scale similar to Tailwind.
  */
 export interface ColorScale {
-    DEFAULT: string;
-    50: string;
-    100: string;
-    200: string;
-    300: string;
-    400: string;
-    500: string;
-    600: string;
-    700: string;
-    800: string;
-    900: string;
-    950: string;
-  }
-  
-  export interface ColorPalette {
-    primary: ColorScale;
-    error: { DEFAULT: string };
-    success: { DEFAULT: string };
-    bg: { DEFAULT: string };
-    surface: { 100: string };
-    text: { primary: string; secondary: string; inverse: string };
-  }
-  
-  // 🟣 Dodger‑blue scale converted from OKLCH → HEX
-  // 50/100/200 tweaked for subtle tints instead of pure white.
-  const primaryScale: ColorScale = {
-    DEFAULT: "#3B82F6", // ✨ central brand tone (≈500 in Tailwind scale)
-    50:  "#FDFDFF",
-    100: "#F6F8FF",
-    200: "#E4EDFE",
-    300: "#D7E6FD",
-    400: "#B0CDFB",
-    500: "#89B4FA",
-    600: "#629BF8",
-    700: "#3B82F6",
-    800: "#0B61EE",
-    900: "#084BB8",
-    950: "#07409E",
-  };
-  
-  export const lightTheme: ColorPalette = {
-    primary: primaryScale,
-    error:   { DEFAULT: "#FF3B30" }, // iOS red
-    success: { DEFAULT: "#34C759" }, // iOS green
-    bg:      { DEFAULT: "#FFFFFF" },
-    surface: { 100: "#F7F7FA" },
-    text:    { primary: "#111827", secondary: "#52525B", inverse: "#FFFFFF" },
-  };
-  
-  // Dark‑theme overrides — lighter blues for better contrast.
-  const primaryDark: ColorScale = {
-    ...primaryScale,
-    DEFAULT: "#89B4FA", // one step lighter than light DEFAULT
-    400: "#A5C2F9",
-    500: "#89B4FA",
-    600: "#629BF8",
-    700: "#3B82F6",
-    800: "#0B61EE",
-  };
-  
-  export const darkTheme: ColorPalette = {
-    primary: primaryDark,
-    error:   { DEFAULT: "#FF453A" }, // iOS dark‑mode red
-    success: { DEFAULT: "#32D74B" }, // iOS dark‑mode green
-    bg:      { DEFAULT: "#0D0D11" },
-    surface: { 100: "#1A1A22" },
-    text:    { primary: "#E6E6EB", secondary: "#A1A1AA", inverse: "#0D0D11" },
-  };
-  
-  /**
-   * Type‑safe helper: get a color via explicit group & shade
-   *
-   * Example: `getColor(theme, 'primary', 600)`
-   */
-  export const getColor = <G extends keyof ColorPalette, S extends keyof ColorPalette[G]>(
-    palette: ColorPalette,
-    group: G,
-    shade: S,
-  ): string => palette[group][shade] as unknown as string;
+  DEFAULT: string;
+  50: string;
+  100: string;
+  200: string;
+  300: string;
+  400: string;
+  500: string;
+  600: string;
+  700: string;
+  800: string;
+  900: string;
+  950: string;
+}
+
+export interface ColorPalette {
+  primary: ColorScale;
+  error: { DEFAULT: string };
+  success: { DEFAULT: string };
+  bg: { DEFAULT: string };
+  surface: { 100: string };
+  text: { primary: string; secondary: string; inverse: string };
+}
+
+const primaryScale: ColorScale = {
+  DEFAULT: "#3FC1F2", // canlı aqua mavi (brand tonu)
+  50:  "#F2FCFF",
+  100: "#D6F7FF",
+  200: "#ADEEFF",
+  300: "#7FE0FB",
+  400: "#50D3F7",
+  500: "#3FC1F2",
+  600: "#30A5D6",
+  700: "#2188B9",
+  800: "#146C9C",
+  900: "#0B567D",
+  950: "#063F5E",
+};
+
+export const lightTheme: ColorPalette = {
+  primary: primaryScale,
+  error: { DEFAULT: "#FF5A5F" }, // daha genç, playful kırmızı
+  success: { DEFAULT: "#00D26A" }, // daha fresh yeşil
+  bg: { DEFAULT: "#F0FAFF" },
+  surface: { 100: "#F9FBFD" }, // biraz daha açık yüzey
+  text: {
+    primary: "#0F172A", // lacivertimsi koyu gri
+    secondary: "#64748B", // gri-mavi ikincil
+    inverse: "#FFFFFF",
+  },
+};
+
+const primaryDark: ColorScale = {
+  ...primaryScale,
+  DEFAULT: "#7FE0FB",
+  400: "#5FD6F7",
+  500: "#3FC1F2",
+  600: "#30A5D6",
+  700: "#2188B9",
+  800: "#146C9C",
+};
+
+export const darkTheme: ColorPalette = {
+  primary: primaryDark,
+  error: { DEFAULT: "#FF6B6F" },
+  success: { DEFAULT: "#00E08A" },
+  bg: { DEFAULT: "#0A0A12" },
+  surface: { 100: "#18181F" },
+  text: {
+    primary: "#E2E8F0",
+    secondary: "#94A3B8",
+    inverse: "#0A0A12",
+  },
+};
+
+export const getColor = <G extends keyof ColorPalette, S extends keyof ColorPalette[G]>(
+  palette: ColorPalette,
+  group: G,
+  shade: S,
+): string => palette[group][shade] as unknown as string;
   

@@ -3,10 +3,12 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function ProfessionalScreen() {
   const router = useRouter();
   const styleData = useStyleData();
+  const { colors } = useTheme();
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } });
@@ -15,7 +17,7 @@ export default function ProfessionalScreen() {
   const professionalList = styleData?.professional || [];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
       <FlatList
         data={professionalList}
         renderItem={({ item, index }) => (

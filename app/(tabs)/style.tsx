@@ -3,11 +3,12 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function StyleScreen() {
-  //TODO: Need to add loading indicator
   const router = useRouter();
   const styleData = useStyleData();
+  const { colors } = useTheme();
   const styleList = styleData?.style || [];
 
   const handlePress = (value: string) => {
@@ -15,7 +16,7 @@ export default function StyleScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
       <FlatList
         data={styleList}
         renderItem={({ item, index }) => (

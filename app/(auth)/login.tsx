@@ -6,18 +6,21 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Switch,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Switch } from "react-native";
 import { useGoogleLogin } from "../../src/firebase/auth/googleLogin";
 import { loginWithApple } from "../../src/firebase/auth/appleLogin";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function LoginScreen() {
+  const { colors } = useTheme();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -68,15 +71,16 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Welcome Back</Text>
+        <Text style={[styles.headerText, { color: colors.text.inverse }]}>Welcome Back</Text>
       </View>
 
-      <View style={styles.formArea}>
+      <View style={[styles.formArea, { backgroundColor: colors.surface[100] }]}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
           placeholder="Email Address"
+          placeholderTextColor={colors.text.secondary}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -84,8 +88,9 @@ export default function LoginScreen() {
         />
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
           placeholder="Password"
+          placeholderTextColor={colors.text.secondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -95,48 +100,50 @@ export default function LoginScreen() {
           <Switch
             value={rememberMe}
             onValueChange={setRememberMe}
-            trackColor={{ false: "#ccc", true: "#7B5EFF" }}
-            thumbColor={rememberMe ? "#FFD700" : "#f4f3f4"}
+            trackColor={{ false: colors.surface[100], true: colors.primary.DEFAULT }}
+            thumbColor={rememberMe ? colors.success.DEFAULT : "#f4f3f4"}
           />
-          <Text style={styles.checkboxLabel}>Beni Hatırla</Text>
+          <Text style={[styles.checkboxLabel, { color: colors.text.primary }]}>Beni Hatırla</Text>
         </View>
 
         <TouchableOpacity style={styles.forgotPassword}>
-          <Text style={styles.forgotText}>Forgot Password?</Text>
+          <Text style={[styles.forgotText, { color: colors.text.secondary }]}>Forgot Password?</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>
+          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
             {loading ? "Loading..." : "Login"}
           </Text>
         </TouchableOpacity>
 
-        <Text style={styles.or}>or</Text>
+        <Text style={[styles.or, { color: colors.text.secondary }]}>or</Text>
 
         <View style={styles.socialRow}>
           <TouchableOpacity
             onPress={handleGoogleLogin}
-            style={styles.socialButton}
+            style={[styles.socialButton, { backgroundColor: colors.bg.DEFAULT }]}
           >
             <FontAwesome name="google" size={24} color="#DB4437" />
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={handleAppleLogin}
-            style={styles.socialButton}
+            style={[styles.socialButton, { backgroundColor: colors.bg.DEFAULT }]}
           >
-            <AntDesign name="apple1" size={24} color="#000" />
+            <AntDesign name="apple1" size={24} color={colors.text.primary} />
           </TouchableOpacity>
         </View>
 
         <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-          <Text style={styles.registerText}>
+          <Text style={[styles.registerText, { color: colors.text.secondary }]}>
             Don’t have an account?{" "}
-            <Text style={styles.registerLink}>Sign Up</Text>
+            <Text style={[styles.registerLink, { color: colors.primary.DEFAULT }]}>
+              Sign Up
+            </Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -145,46 +152,73 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, backgroundColor: "#7B5EFF" },
+  container: { flexGrow: 1 },
   header: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 60,
   },
-  headerText: { color: "#fff", fontSize: 28, fontWeight: "bold" },
+  headerText: {
+    fontSize: 28,
+    fontWeight: "bold",
+  },
   formArea: {
-    backgroundColor: "#fff",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     padding: 24,
     flex: 1,
   },
   input: {
-    backgroundColor: "#F5F5F5",
     padding: 14,
     borderRadius: 12,
     marginBottom: 16,
   },
-  checkboxRow: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-  checkboxLabel: { marginLeft: 8, fontSize: 14, color: "#333" },
-  forgotPassword: { alignSelf: "flex-end", marginBottom: 20 },
-  forgotText: { fontSize: 13, color: "#888", textDecorationLine: "underline" },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  forgotPassword: {
+    alignSelf: "flex-end",
+    marginBottom: 20,
+  },
+  forgotText: {
+    fontSize: 13,
+    textDecorationLine: "underline",
+  },
   button: {
-    backgroundColor: "#FFD700",
     paddingVertical: 14,
     borderRadius: 30,
     alignItems: "center",
     marginBottom: 20,
   },
-  buttonText: { fontSize: 16, fontWeight: "600", color: "#000" },
-  or: { textAlign: "center", marginVertical: 8, color: "#888" },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  or: {
+    textAlign: "center",
+    marginVertical: 8,
+  },
   socialRow: {
     flexDirection: "row",
     justifyContent: "center",
     gap: 16,
     marginBottom: 20,
   },
-  socialButton: { backgroundColor: "#F5F5F5", padding: 12, borderRadius: 12 },
-  registerText: { color: "#444", textAlign: "center" },
-  registerLink: { fontWeight: "bold", textDecorationLine: "underline" },
+  socialButton: {
+    padding: 12,
+    borderRadius: 12,
+  },
+  registerText: {
+    textAlign: "center",
+  },
+  registerLink: {
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+  },
 });

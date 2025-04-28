@@ -12,11 +12,11 @@ import {
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
-import { db, storage } from "../../../src/firebase/config";
+import { db } from "../../../src/firebase/config";
 import { useFavorites } from "../../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { useTheme } from "../../../src/context/ThemeContext";
 import ImagePreviewModal from "../../../src/components/ImagePreviewModal";
 import { getRecentGeneratedImages } from "../../../src/utils/saveGeneratedImage";
 
@@ -25,10 +25,11 @@ const screenWidth = Dimensions.get("window").width;
 export default function ProfileScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
+  const { colors } = useTheme();
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState<string[]>([]);
-  const [previewUri, setPreviewUri] = useState<string | null>(null); // ✅ State ekledik
+  const [previewUri, setPreviewUri] = useState<string | null>(null);
   const { favorites } = useFavorites();
   const router = useRouter();
 
@@ -62,43 +63,55 @@ export default function ProfileScreen() {
 
   if (!user || loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#fff" />
+      <View style={[styles.centered, { backgroundColor: colors.primary[600] }]}>
+        <ActivityIndicator size="large" color={colors.text.inverse} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.primary[600] }]}>
+      <View style={[styles.headerContainer, { backgroundColor: colors.primary[600] }]}>
         <View style={styles.headerTop}>
-          <Text style={styles.username}>
+          <Text style={[styles.username, { color: colors.text.inverse }]}>
             {userInfo?.username || "Yunus Emre[MOCK]"}
           </Text>
-          <Text style={styles.email}>{userInfo?.email || user.email}</Text>
+          <Text style={[styles.email, { color: colors.text.secondary }]}>
+            {userInfo?.email || user.email}
+          </Text>
 
           <TouchableOpacity
             style={styles.menuButton}
             onPress={handleGoSettings}
           >
-            <Ionicons name="menu" size={28} color="#fff" />
+            <Ionicons name="menu" size={28} color={colors.text.inverse} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.statsCard}>
+        <View style={[styles.statsCard, { backgroundColor: colors.surface[100] }]}>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>{userInfo?.coins || 0}</Text>
-            <Text style={styles.statLabel}>Coins</Text>
+            <Text style={[styles.statValue, { color: colors.text.primary }]}>
+              {userInfo?.coins || 0}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+              Coins
+            </Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>{favorites.length}</Text>
-            <Text style={styles.statLabel}>Favoriler</Text>
+            <Text style={[styles.statValue, { color: colors.text.primary }]}>
+              {favorites.length}
+            </Text>
+            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+              Favoriler
+            </Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>
+            <Text style={[styles.statValue, { color: colors.text.primary }]}>
               {userInfo?.generatedCount || 0}
             </Text>
-            <Text style={styles.statLabel}>Üretimler</Text>
+            <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
+              Üretimler
+            </Text>
           </View>
         </View>
       </View>
@@ -113,11 +126,10 @@ export default function ProfileScreen() {
             <Image source={{ uri: item }} style={styles.imageItem} />
           </TouchableOpacity>
         )}
-        contentContainerStyle={styles.gridContainer}
+        contentContainerStyle={[styles.gridContainer, { backgroundColor: colors.primary[600] }]}
         showsVerticalScrollIndicator={false}
       />
 
-      {/* ✅ ImagePreviewModal ekledik */}
       <ImagePreviewModal
         visible={!!previewUri}
         uri={previewUri!}
@@ -130,16 +142,13 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#7B5EFF",
   },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#7B5EFF",
   },
   headerContainer: {
-    backgroundColor: "#7B5EFF",
     paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 20,
@@ -152,11 +161,9 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#fff",
   },
   email: {
     fontSize: 14,
-    color: "#ddd",
     marginTop: 4,
   },
   menuButton: {
@@ -167,7 +174,6 @@ const styles = StyleSheet.create({
   statsCard: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#fff",
     borderRadius: 16,
     marginTop: 20,
     marginHorizontal: 20,
@@ -179,15 +185,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
   },
   statLabel: {
     fontSize: 12,
-    color: "#777",
     marginTop: 4,
   },
   gridContainer: {
-    backgroundColor: "#7B5EFF",
     padding: 2,
     paddingBottom: 100,
   },

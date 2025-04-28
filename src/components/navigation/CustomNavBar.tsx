@@ -1,5 +1,5 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { useTheme } from "@react-navigation/native";
+import { useTheme } from "../../context/ThemeContext"; // Uyumlu hale getirdik
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import Animated, {
   FadeIn,
@@ -7,23 +7,20 @@ import Animated, {
   LinearTransition,
   BounceIn,
   SlideInUp,
-  BounceInUp, 
-  BounceOutDown
+  BounceInUp,
+  BounceOutDown,
 } from "react-native-reanimated";
 import { Feather, Ionicons } from "@expo/vector-icons";
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
 
-const PRIMARY_COLOR = "#130057";
-const SECONDARY_COLOR = "#fff";
-
 const CustomNavBar: React.FC<BottomTabBarProps> = ({
   state,
   descriptors,
   navigation,
 }) => {
-  const { colors } = useTheme();
+  const { colors } = useTheme(); // colors'ı tema üzerinden alıyoruz
   const currentRouteName = state.routes[state.index].name;
   const isUploadImageScreen = currentRouteName === "upload-image";
 
@@ -56,19 +53,21 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
         onPress={onPress}
         style={[
           styles.tabItem,
-          { backgroundColor: isFocused ? SECONDARY_COLOR : "transparent" },
+          {
+            backgroundColor: isFocused ? colors.primary[700] : "transparent", // Greenish background when focused
+          },
         ]}
       >
         {getIconByRouteName(
           route.name,
-          isFocused ? PRIMARY_COLOR : SECONDARY_COLOR
+          isFocused ? colors.text.inverse : colors.text.primary // Icon color changes based on focus
         )}
         {isFocused && label && (
           <Animated.Text
             entering={FadeIn.duration(200)}
             exiting={FadeOut.duration(200)}
             style={{
-              color: isFocused ? PRIMARY_COLOR : SECONDARY_COLOR,
+              color: isFocused ? colors.text.inverse : colors.text.primary, // Text color change based on focus
               fontSize: 14,
               paddingLeft: 4,
               textAlign: "center",
@@ -82,19 +81,17 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.primary[600] }]}>
       {state.routes.map((route, index) => renderTab(route, index))}
 
       {isUploadImageScreen && (
         <Animated.View
-        // TODO: Animation will change,
           entering={SlideInUp.duration(100)}
           exiting={BounceOutDown.duration(400)}
-          style={styles.plusWrapper}
+          style={[styles.plusWrapper, { backgroundColor: colors.primary[500] }]} // Slightly different green
         >
-          {/* Üstteki + simgesi */}
-          <View style={styles.plusButton}>
-            <Feather name="plus" size={32} color="#fff" />
+          <View style={[styles.plusButton, { backgroundColor: colors.success.DEFAULT }]}>
+            <Feather name="plus" size={32} color={colors.text.inverse} />
           </View>
         </Animated.View>
       )}
@@ -125,7 +122,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: PRIMARY_COLOR,
     width: "80%",
     alignSelf: "center",
     bottom: 40,
@@ -152,7 +148,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#FFD700",
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,

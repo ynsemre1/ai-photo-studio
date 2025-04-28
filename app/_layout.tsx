@@ -1,9 +1,35 @@
-// app/_layout.tsx
 import { Slot, useRouter, usePathname } from "expo-router";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
-import { ThemeProvider } from "../src/context/ThemeContext";
+import { ThemeProvider, useTheme } from "../src/context/ThemeContext";
+import { View, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+function ThemeSwitchButton() {
+  const { toggle, scheme } = useTheme();
+
+  return (
+    <TouchableOpacity
+      onPress={toggle}
+      style={{
+        position: "absolute",
+        top: 50,
+        right: 20,
+        zIndex: 999,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        padding: 8,
+        borderRadius: 20,
+      }}
+    >
+      <Ionicons
+        name={scheme === "dark" ? "sunny-outline" : "moon-outline"}
+        size={24}
+        color="#FFD700"
+      />
+    </TouchableOpacity>
+  );
+}
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -11,7 +37,6 @@ export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
 
-  // auth control
   useEffect(
     () =>
       onAuthStateChanged(auth, (u) => {
@@ -21,7 +46,6 @@ export default function RootLayout() {
     []
   );
 
-  // 2) Yönlendirme
   useEffect(() => {
     if (!ready) return;
 
@@ -31,10 +55,9 @@ export default function RootLayout() {
         pathname === "/login" ||
         pathname === "/register"
       ) {
-        router.replace("/"); // Home = /(tabs)/index
+        router.replace("/");
       }
     } else {
-      // Çıkış yaptıysa korumalı ekranlara girmesin
       if (
         pathname === "/" ||
         pathname === "/car" ||
@@ -47,11 +70,14 @@ export default function RootLayout() {
     }
   }, [ready, user, pathname]);
 
-  if (!ready) return null; // For the splash screen
+  if (!ready) return null;
 
   return (
     <ThemeProvider>
-      <Slot />
+      <View style={{ flex: 1 }}>
+        <Slot />
+        <ThemeSwitchButton />
+      </View>
     </ThemeProvider>
   );
 }

@@ -3,10 +3,12 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function CarScreen() {
   const router = useRouter();
   const styleData = useStyleData();
+  const { colors } = useTheme();
   const carList = styleData?.car || [];
 
   const handlePress = (value: string) => {
@@ -14,7 +16,7 @@ export default function CarScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
       <FlatList
         data={carList}
         renderItem={({ item }) =>

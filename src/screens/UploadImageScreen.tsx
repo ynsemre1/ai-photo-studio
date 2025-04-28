@@ -15,6 +15,7 @@ import { useLocalSearchParams } from "expo-router";
 import { editPhoto } from "../utils/editPhoto";
 import { getAuth } from "firebase/auth";
 import { Feather } from "@expo/vector-icons";
+import { useTheme } from "../../src/context/ThemeContext";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -23,6 +24,7 @@ export default function UploadImageScreen() {
   const [originalUri, setOriginalUri] = useState<string | null>(null);
   const [generatedUri, setGeneratedUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -69,28 +71,30 @@ export default function UploadImageScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
       {/* 1️⃣ Orijinal Görsel */}
       <TouchableOpacity
-        style={styles.previewBox}
+        style={[styles.previewBox, { borderColor: colors.text.inverse }]}
         onPress={pickImage}
         activeOpacity={0.8}
       >
         {originalUri ? (
           <Image source={{ uri: originalUri }} style={styles.image} />
         ) : (
-          <Text style={styles.placeholderText}>Henüz fotoğraf seçilmedi</Text>
+          <Text style={[styles.placeholderText, { color: colors.text.inverse }]}>
+            Henüz fotoğraf seçilmedi
+          </Text>
         )}
       </TouchableOpacity>
 
       {/* 2️⃣ Üretilen Görsel */}
       <TouchableOpacity
-        style={styles.previewBox}
+        style={[styles.previewBox, { borderColor: colors.text.inverse }]}
         onPress={!generatedUri && !loading ? handleUpload : undefined}
         activeOpacity={0.8}
       >
         {loading ? (
-          <ActivityIndicator size="large" color="#FFD700" />
+          <ActivityIndicator size="large" color={colors.success.DEFAULT} />
         ) : generatedUri ? (
           <>
             <Image source={{ uri: generatedUri }} style={styles.image} />
@@ -103,7 +107,7 @@ export default function UploadImageScreen() {
             </TouchableOpacity>
           </>
         ) : (
-          <Text style={styles.placeholderText}>
+          <Text style={[styles.placeholderText, { color: colors.text.inverse }]}>
             Fotoğrafı Yollamak İçin Bas
           </Text>
         )}
@@ -116,7 +120,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: "center",
-    backgroundColor: "#7B5EFF",
     flexGrow: 1,
   },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#fff" },
@@ -125,7 +128,6 @@ const styles = StyleSheet.create({
     height: screenWidth - 40,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#fff",
     marginBottom: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -137,7 +139,6 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   placeholderText: {
-    color: "#ddd",
     textAlign: "center",
   },
   refreshButton: {

@@ -16,11 +16,13 @@ import { getRecentGeneratedImages } from "../../src/utils/saveGeneratedImage";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
 import ImagePreviewModal from "../../src/components/ImagePreviewModal";
+import { useTheme } from "../../src/context/ThemeContext";
 
 export default function HomeScreen() {
   const router = useRouter();
   const { favorites } = useFavorites();
   const styleData = useStyleData();
+  const { colors } = useTheme();
 
   const [showFavorites, setShowFavorites] = useState(true);
   const [showAllStyles, setShowAllStyles] = useState(true);
@@ -57,11 +59,11 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: colors.bg.DEFAULT }]}>
       {recentImages.length > 0 && (
         <>
           <TouchableOpacity style={styles.sectionHeader}>
-            <Text style={styles.header}>Son Üretilenler</Text>
+            <Text style={[styles.header, { color: colors.text.primary }]}>Son Üretilenler</Text>
           </TouchableOpacity>
           <ScrollView
             horizontal
@@ -77,7 +79,6 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* ✅ Bizim yeni modal'ı buraya ekliyoruz */}
       <ImagePreviewModal
         visible={!!previewUri}
         uri={previewUri!}
@@ -90,11 +91,11 @@ export default function HomeScreen() {
             style={styles.sectionHeader}
             onPress={() => setShowFavorites((prev) => !prev)}
           >
-            <Text style={styles.header}>Favoriler</Text>
+            <Text style={[styles.header, { color: colors.text.primary }]}>Favoriler</Text>
             <Ionicons
               name={showFavorites ? "chevron-up" : "chevron-down"}
               size={20}
-              color="#333"
+              color={colors.text.primary}
             />
           </TouchableOpacity>
 
@@ -124,11 +125,11 @@ export default function HomeScreen() {
         style={styles.sectionHeader}
         onPress={() => setShowAllStyles((prev) => !prev)}
       >
-        <Text style={styles.header}>Tüm Stiller</Text>
+        <Text style={[styles.header, { color: colors.text.primary }]}>Tüm Stiller</Text>
         <Ionicons
           name={showAllStyles ? "chevron-up" : "chevron-down"}
           size={20}
-          color="#333"
+          color={colors.text.primary}
         />
       </TouchableOpacity>
 
@@ -153,7 +154,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   scrollContainer: {
     paddingTop: 20,
-    backgroundColor: "#fff",
     paddingBottom: 40,
   },
   sectionHeader: {
@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
   },
   horizontalList: {
     paddingLeft: 8,
