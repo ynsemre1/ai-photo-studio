@@ -88,7 +88,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
         <Animated.View
           entering={SlideInUp.duration(100)}
           exiting={BounceOutDown.duration(400)}
-          style={[styles.plusWrapper, { backgroundColor: colors.primary[500] }]} // Slightly different green
+          style={[styles.plusWrapper]}
         >
           <View style={[styles.plusButton, { backgroundColor: colors.success.DEFAULT }]}>
             <Feather name="plus" size={32} color={colors.text.inverse} />
@@ -133,8 +133,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOpacity: 0.25,
     elevation: 10,
-    borderTopWidth: 1.5,
-    borderTopColor: "#00000030",
     zIndex: 2,
   },
   plusWrapper: {

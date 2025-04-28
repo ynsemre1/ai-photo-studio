@@ -36,7 +36,7 @@ export interface ColorPalette {
 }
 
 const primaryScale: ColorScale = {
-  DEFAULT: "#3FC1F2", // canlı aqua mavi (brand tonu)
+  DEFAULT: "#3FC1F2",
   50:  "#F2FCFF",
   100: "#D6F7FF",
   200: "#ADEEFF",
@@ -52,13 +52,13 @@ const primaryScale: ColorScale = {
 
 export const lightTheme: ColorPalette = {
   primary: primaryScale,
-  error: { DEFAULT: "#FF5A5F" }, // daha genç, playful kırmızı
-  success: { DEFAULT: "#00D26A" }, // daha fresh yeşil
+  error: { DEFAULT: "#FF5A5F" }, 
+  success: { DEFAULT: "#00D26A" }, 
   bg: { DEFAULT: "#F0FAFF" },
-  surface: { 100: "#F9FBFD" }, // biraz daha açık yüzey
+  surface: { 100: "#F9FBFD" }, 
   text: {
-    primary: "#0F172A", // lacivertimsi koyu gri
-    secondary: "#64748B", // gri-mavi ikincil
+    primary: "#0F172A", 
+    secondary: "#64748B",
     inverse: "#FFFFFF",
   },
 };
