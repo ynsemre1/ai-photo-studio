@@ -25,7 +25,7 @@ const screenWidth = Dimensions.get("window").width;
 export default function ProfileScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState<string[]>([]);
@@ -63,17 +63,17 @@ export default function ProfileScreen() {
 
   if (!user || loading) {
     return (
-      <View style={[styles.centered, { backgroundColor: colors.primary[600] }]}>
+      <View style={[styles.centered, { backgroundColor: colors.bg.DEFAULT }]}>
         <ActivityIndicator size="large" color={colors.text.inverse} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.primary[600] }]}>
-      <View style={[styles.headerContainer, { backgroundColor: colors.primary[600] }]}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}>
+      <View style={[styles.headerContainer, { backgroundColor: colors.bg.DEFAULT }]}>
         <View style={styles.headerTop}>
-          <Text style={[styles.username, { color: colors.text.inverse }]}>
+          <Text style={[styles.username, { color: colors.text.primary }]}>
             {userInfo?.username || "Yunus Emre[MOCK]"}
           </Text>
           <Text style={[styles.email, { color: colors.text.secondary }]}>
@@ -84,11 +84,11 @@ export default function ProfileScreen() {
             style={styles.menuButton}
             onPress={handleGoSettings}
           >
-            <Ionicons name="menu" size={28} color={colors.text.inverse} />
+            <Ionicons name="menu" size={28} color={colors.text.primary} />
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.statsCard, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.statsCard, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
               {userInfo?.coins || 0}
@@ -126,7 +126,7 @@ export default function ProfileScreen() {
             <Image source={{ uri: item }} style={styles.imageItem} />
           </TouchableOpacity>
         )}
-        contentContainerStyle={[styles.gridContainer, { backgroundColor: colors.primary[600] }]}
+        contentContainerStyle={[styles.gridContainer, { backgroundColor: colors.bg.DEFAULT }]}
         showsVerticalScrollIndicator={false}
       />
 

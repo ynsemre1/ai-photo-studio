@@ -20,7 +20,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
-  const { colors } = useTheme(); // colors'ı tema üzerinden alıyoruz
+  const { colors, scheme } = useTheme(); // colors'ı tema üzerinden alıyoruz
   const currentRouteName = state.routes[state.index].name;
   const isUploadImageScreen = currentRouteName === "upload-image";
 
@@ -81,7 +81,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.primary[600] }]}>
+    <View style={[styles.container, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[600] }]}>
       {state.routes.map((route, index) => renderTab(route, index))}
 
       {isUploadImageScreen && (
