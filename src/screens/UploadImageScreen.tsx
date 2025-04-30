@@ -24,7 +24,7 @@ export default function UploadImageScreen() {
   const [originalUri, setOriginalUri] = useState<string | null>(null);
   const [generatedUri, setGeneratedUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -71,17 +71,17 @@ export default function UploadImageScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
       {/* 1️⃣ Orijinal Görsel */}
       <TouchableOpacity
-        style={[styles.previewBox, { borderColor: colors.text.inverse }]}
+        style={[styles.previewBox, { borderColor: scheme === "dark" ? colors.text.primary : colors.text.primary }]}
         onPress={pickImage}
         activeOpacity={0.8}
       >
         {originalUri ? (
           <Image source={{ uri: originalUri }} style={styles.image} />
         ) : (
-          <Text style={[styles.placeholderText, { color: colors.text.inverse }]}>
+          <Text style={[styles.placeholderText, { color: scheme === "dark" ? colors.text.primary : colors.text.primary }]}>
             Henüz fotoğraf seçilmedi
           </Text>
         )}
@@ -89,7 +89,7 @@ export default function UploadImageScreen() {
 
       {/* 2️⃣ Üretilen Görsel */}
       <TouchableOpacity
-        style={[styles.previewBox, { borderColor: colors.text.inverse }]}
+        style={[styles.previewBox, { borderColor: scheme === "dark" ? colors.text.primary : colors.text.primary }]}
         onPress={!generatedUri && !loading ? handleUpload : undefined}
         activeOpacity={0.8}
       >
@@ -103,11 +103,11 @@ export default function UploadImageScreen() {
               onPress={handleResetGenerated}
               activeOpacity={0.8}
             >
-              <Feather name="rotate-ccw" size={20} color="#fff" />
+              <Feather name="rotate-ccw" size={20} color={colors.text.primary} />
             </TouchableOpacity>
           </>
         ) : (
-          <Text style={[styles.placeholderText, { color: colors.text.inverse }]}>
+          <Text style={[styles.placeholderText, { color: scheme === "dark" ? colors.text.primary : colors.text.primary }]}>
             Fotoğrafı Yollamak İçin Bas
           </Text>
         )}
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexGrow: 1,
   },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, color: "#fff" },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
   previewBox: {
     width: screenWidth - 40,
     height: screenWidth - 40,
