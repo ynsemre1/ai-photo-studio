@@ -25,7 +25,9 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   const isUploadImageScreen = currentRouteName === "upload-image";
 
   const renderTab = (route: any, index: number) => {
-    if (["_sitemap", "+not-found", "upload-image", "index"].includes(route.name))
+    if (
+      ["_sitemap", "+not-found", "upload-image", "index"].includes(route.name)
+    )
       return null;
 
     const { options } = descriptors[route.key];
@@ -54,7 +56,11 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
         style={[
           styles.tabItem,
           {
-            backgroundColor: isFocused ? colors.primary[700] : "transparent", // Greenish background when focused
+            backgroundColor: isFocused
+              ? scheme === "dark"
+                ? colors.success.DEFAULT
+                : colors.primary[700]
+              : "transparent",
           },
         ]}
       >
@@ -81,7 +87,15 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[600] }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            scheme === "dark" ? colors.surface[100] : colors.primary[600],
+        },
+      ]}
+    >
       {state.routes.map((route, index) => renderTab(route, index))}
 
       {isUploadImageScreen && (
@@ -90,7 +104,12 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
           exiting={BounceOutDown.duration(400)}
           style={[styles.plusWrapper]}
         >
-          <View style={[styles.plusButton, { backgroundColor: colors.success.DEFAULT }]}>
+          <View
+            style={[
+              styles.plusButton,
+              { backgroundColor: colors.success.DEFAULT },
+            ]}
+          >
             <Feather name="plus" size={32} color={colors.text.inverse} />
           </View>
         </Animated.View>
