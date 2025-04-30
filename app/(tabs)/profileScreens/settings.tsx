@@ -18,7 +18,7 @@ export default function SettingsScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
   const isSocialLogin = user?.providerData?.[0]?.providerId !== "password";
   const version =
     Application.nativeApplicationVersion || "Sürüm bilgisi bulunamadı";
@@ -45,12 +45,12 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.primary[600] }]}>
-      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
-        <Text style={[styles.header, { color: colors.text.inverse }]}>Ayarlar</Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}>
+      <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
+        <Text style={[styles.header, { color: colors.text.primary }]}>Ayarlar</Text>
 
         {/* Hesap */}
-        <View style={[styles.card, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.card, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <Text style={[styles.cardTitle, { color: colors.text.primary }]}>Hesap</Text>
           {isSocialLogin ? (
             <Text style={[styles.info, { color: colors.text.secondary }]}>
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Uygulama */}
-        <View style={[styles.card, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.card, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <Text style={[styles.cardTitle, { color: colors.text.primary }]}>Uygulama</Text>
           <TouchableOpacity style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}>
             <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
@@ -88,7 +88,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Gizlilik */}
-        <View style={[styles.card, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.card, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <Text style={[styles.cardTitle, { color: colors.text.primary }]}>Gizlilik</Text>
           <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
             <Text style={[styles.buttonText, { color: colors.error.DEFAULT }]}>
@@ -113,7 +113,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Destek */}
-        <View style={[styles.card, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.card, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <Text style={[styles.cardTitle, { color: colors.text.primary }]}>Destek</Text>
           <TouchableOpacity style={styles.button} onPress={handleSupport}>
             <Text style={[styles.buttonText, { color: colors.text.primary }]}>
@@ -123,7 +123,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Hakkında */}
-        <View style={[styles.card, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.card, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <Text style={[styles.cardTitle, { color: colors.text.primary }]}>Hakkında</Text>
           <Text style={[styles.info, { color: colors.text.secondary }]}>
             Bu uygulama, kullanıcıların fotoğraflarına yaratıcı stiller ve
@@ -133,7 +133,7 @@ export default function SettingsScreen() {
         </View>
 
         {/* Sürüm */}
-        <View style={[styles.card, { backgroundColor: colors.surface[100] }]}>
+        <View style={[styles.card, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
           <Text style={[styles.cardTitle, { color: colors.text.primary }]}>Sürüm</Text>
           <Text style={[styles.info, { color: colors.text.secondary }]}>{version}</Text>
         </View>
