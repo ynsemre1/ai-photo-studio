@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,23 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Linking,
 } from "react-native";
-import { getAuth, signOut } from "firebase/auth";
+import {
+  getAuth,
+  signOut,
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+} from "firebase/auth";
 import * as Application from "expo-application";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../../src/context/ThemeContext";
-import { Linking } from "react-native";
+import Dialog from "react-native-dialog";
+import { deleteDoc, doc, collection, getDocs } from "firebase/firestore";
+import { deleteObject, listAll, ref } from "firebase/storage";
+import { db, dbUsers, storage } from "../../../src/firebase/config";
 
 export default function SettingsScreen() {
   const auth = getAuth();
@@ -23,16 +33,8 @@ export default function SettingsScreen() {
   const version =
     Application.nativeApplicationVersion || "Sürüm bilgisi bulunamadı";
 
-  const handleDeleteAccount = () => {
-    Alert.alert("Bilgilendirme", "Veri silme özelliği henüz aktif değildir.");
-  };
-
-  const handleSupport = () => {
-    Alert.alert(
-      "Destek",
-      "Lütfen 4.dort.studios@gmail.com adresine e-posta gönderin."
-    );
-  };
+  const [showDialog, setShowDialog] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
 
   const handleLogout = async () => {
     try {
@@ -42,6 +44,68 @@ export default function SettingsScreen() {
       console.error("Logout Error:", error);
       Alert.alert("Hata", "Çıkış yapılamadı, lütfen tekrar deneyin.");
     }
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Dikkat!",
+      "Bu işlem hesabınızı, oluşturduğunuz tüm fotoğrafları ve kayıtlı verileri kalıcı olarak silecektir. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?",
+      [
+        { text: "Vazgeç", style: "cancel" },
+        {
+          text: "Evet, Devam Et",
+          style: "destructive",
+          onPress: () => setShowDialog(true),
+        },
+      ]
+    );
+  };
+
+  const handleDeleteConfirmed = async () => {
+    setShowDialog(false);
+    const password = passwordInput;
+    setPasswordInput("");
+
+    if (!user || !password) return;
+
+    try {
+      const credential = EmailAuthProvider.credential(user.email!, password);
+      await reauthenticateWithCredential(user, credential);
+
+      const uid = user.uid;
+
+      // Firestore: kullanıcı bilgisi sil
+      await deleteDoc(doc(dbUsers, "users", uid));
+
+      // Storage: generatedImages/{uid} sil
+      const generatedRef = ref(storage, `generatedImages/${uid}`);
+      const generatedFiles = await listAll(generatedRef);
+      for (const item of generatedFiles.items) {
+        await deleteObject(item);
+      }
+
+      // Storage: uploads/{uid} sil
+      const uploadsRef = ref(storage, `uploads/${uid}`);
+      const uploadFiles = await listAll(uploadsRef);
+      for (const item of uploadFiles.items) {
+        await deleteObject(item);
+      }
+
+      // Auth hesabı sil
+      await deleteUser(user);
+
+      Alert.alert("Silindi", "Hesabınız ve tüm verileriniz kaldırıldı.");
+      router.replace("/(auth)/welcome");
+    } catch (err: any) {
+      Alert.alert("Hata", err.message);
+    }
+  };
+
+  const handleSupport = () => {
+    Alert.alert(
+      "Destek",
+      "Lütfen 4.dort.studios@gmail.com adresine e-posta gönderin."
+    );
   };
 
   return (
@@ -81,6 +145,7 @@ export default function SettingsScreen() {
                   styles.button,
                   { backgroundColor: colors.success.DEFAULT },
                 ]}
+                onPress={() => router.push("/profileScreens/changePassword")}
               >
                 <Text
                   style={[styles.buttonText, { color: colors.text.inverse }]}
@@ -88,11 +153,13 @@ export default function SettingsScreen() {
                   Parola Değiştir
                 </Text>
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={[
                   styles.button,
                   { backgroundColor: colors.success.DEFAULT },
                 ]}
+                onPress={() => router.push("/profileScreens/changeEmail")}
               >
                 <Text
                   style={[styles.buttonText, { color: colors.text.inverse }]}
@@ -234,6 +301,22 @@ export default function SettingsScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Dialog */}
+      <Dialog.Container visible={showDialog}>
+        <Dialog.Title>Hesabını Sil</Dialog.Title>
+        <Dialog.Description>
+          Lütfen devam etmek için şifrenizi girin.
+        </Dialog.Description>
+        <Dialog.Input
+          placeholder="Şifreniz"
+          secureTextEntry
+          value={passwordInput}
+          onChangeText={setPasswordInput}
+        />
+        <Dialog.Button label="İptal" onPress={() => setShowDialog(false)} />
+        <Dialog.Button label="Sil" onPress={handleDeleteConfirmed} />
+      </Dialog.Container>
     </View>
   );
 }
