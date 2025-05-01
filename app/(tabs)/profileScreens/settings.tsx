@@ -45,190 +45,196 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: colors.bg.DEFAULT },
-      ]}
-    >
-      <Text style={[styles.header, { color: colors.text.primary }]}>
-        Ayarlar
-      </Text>
-
-      {/* Hesap */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor:
-              scheme === "dark" ? colors.surface[100] : colors.primary[100],
-          },
+    <View style={{ flex: 1, backgroundColor: colors.bg.DEFAULT }}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: colors.bg.DEFAULT },
         ]}
       >
-        <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-          Hesap
+        <Text style={[styles.header, { color: colors.text.primary }]}>
+          Ayarlar
         </Text>
-        {isSocialLogin ? (
-          <Text style={[styles.info, { color: colors.text.secondary }]}>
-            Bu hesap bir Google/Apple hesabı ile oluşturulduğu için parola ve
-            e-posta değiştirilemez.
-          </Text>
-        ) : (
-          <>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { backgroundColor: colors.success.DEFAULT },
-              ]}
-            >
-              <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
-                Parola Değiştir
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                { backgroundColor: colors.success.DEFAULT },
-              ]}
-            >
-              <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
-                E-posta Değiştir
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.error.DEFAULT }]}
-          onPress={handleLogout}
-        >
-          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
-            Çıkış Yap
-          </Text>
-        </TouchableOpacity>
-      </View>
 
-      {/* Uygulama */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor:
-              scheme === "dark" ? colors.surface[100] : colors.primary[100],
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-          Uygulama
-        </Text>
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
-          onPress={toggle}
+        {/* Hesap */}
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
         >
-          <Ionicons
-            name={scheme === "dark" ? "sunny-outline" : "moon-outline"}
-            size={20}
-            color={colors.text.inverse}
-            style={{ marginRight: 8 }}
-          />
-          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
-            Tema: {scheme === "dark" ? "Koyu" : "Açık"}
+          <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
+            Hesap
           </Text>
-        </TouchableOpacity>
-      </View>
+          {isSocialLogin ? (
+            <Text style={[styles.info, { color: colors.text.secondary }]}>
+              Bu hesap bir Google/Apple hesabı ile oluşturulduğu için parola ve
+              e-posta değiştirilemez.
+            </Text>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: colors.success.DEFAULT },
+                ]}
+              >
+                <Text
+                  style={[styles.buttonText, { color: colors.text.inverse }]}
+                >
+                  Parola Değiştir
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: colors.success.DEFAULT },
+                ]}
+              >
+                <Text
+                  style={[styles.buttonText, { color: colors.text.inverse }]}
+                >
+                  E-posta Değiştir
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.error.DEFAULT }]}
+            onPress={handleLogout}
+          >
+            <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+              Çıkış Yap
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Gizlilik */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor:
-              scheme === "dark" ? colors.surface[100] : colors.primary[100],
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-          Gizlilik
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
-          <Text style={[styles.buttonText, { color: colors.error.DEFAULT }]}>
-            Verilerimi Sil
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
-          onPress={() => Linking.openURL("https://legal.4studios.com.tr/")}
+        {/* Uygulama */}
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
         >
-          <Ionicons
-            name="shield-checkmark-outline"
-            size={20}
-            color={colors.text.inverse}
-            style={styles.icon}
-          />
-          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+          <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
+            Uygulama
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
+            onPress={toggle}
+          >
+            <Ionicons
+              name={scheme === "dark" ? "sunny-outline" : "moon-outline"}
+              size={20}
+              color={colors.text.inverse}
+              style={{ marginRight: 8 }}
+            />
+            <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+              Tema: {scheme === "dark" ? "Koyu" : "Açık"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Gizlilik */}
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
             Gizlilik
           </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.button} onPress={handleDeleteAccount}>
+            <Text style={[styles.buttonText, { color: colors.error.DEFAULT }]}>
+              Verilerimi Sil
+            </Text>
+          </TouchableOpacity>
 
-      {/* Destek */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor:
-              scheme === "dark" ? colors.surface[100] : colors.primary[100],
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-          Destek
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={handleSupport}>
-          <Text style={[styles.buttonText, { color: colors.text.primary }]}>
-            support@example.com
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
+            onPress={() => Linking.openURL("https://legal.4studios.com.tr/")}
+          >
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={20}
+              color={colors.text.inverse}
+              style={styles.icon}
+            />
+            <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+              Gizlilik
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Destek */}
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
+            Destek
           </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.button} onPress={handleSupport}>
+            <Text style={[styles.buttonText, { color: colors.text.primary }]}>
+              support@example.com
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Hakkında */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor:
-              scheme === "dark" ? colors.surface[100] : colors.primary[100],
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-          Hakkında
-        </Text>
-        <Text style={[styles.info, { color: colors.text.secondary }]}>
-          Bu uygulama, kullanıcıların fotoğraflarına yaratıcı stiller ve
-          efektler uygulayarak farklı sonuçlar elde etmesini sağlayan bir
-          fotoğraf düzenleme aracıdır.
-        </Text>
-      </View>
+        {/* Hakkında */}
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
+            Hakkında
+          </Text>
+          <Text style={[styles.info, { color: colors.text.secondary }]}>
+            Bu uygulama, kullanıcıların fotoğraflarına yaratıcı stiller ve
+            efektler uygulayarak farklı sonuçlar elde etmesini sağlayan bir
+            fotoğraf düzenleme aracıdır.
+          </Text>
+        </View>
 
-      {/* Sürüm */}
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor:
-              scheme === "dark" ? colors.surface[100] : colors.primary[100],
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
-          Sürüm
-        </Text>
-        <Text style={[styles.info, { color: colors.text.secondary }]}>
-          {version}
-        </Text>
-      </View>
-    </ScrollView>
+        {/* Sürüm */}
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
+        >
+          <Text style={[styles.cardTitle, { color: colors.text.primary }]}>
+            Sürüm
+          </Text>
+          <Text style={[styles.info, { color: colors.text.secondary }]}>
+            {version}
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 

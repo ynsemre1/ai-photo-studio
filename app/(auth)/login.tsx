@@ -71,83 +71,123 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
-      <View style={styles.header}>
-        <Text style={[styles.headerText, { color: colors.text.inverse }]}>Welcome Back</Text>
-      </View>
-
-      <View style={[styles.formArea, { backgroundColor: colors.surface[100] }]}>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
-          placeholder="Email Address"
-          placeholderTextColor={colors.text.secondary}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
-          placeholder="Password"
-          placeholderTextColor={colors.text.secondary}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <View style={styles.checkboxRow}>
-          <Switch
-            value={rememberMe}
-            onValueChange={setRememberMe}
-            trackColor={{ false: colors.surface[100], true: colors.primary.DEFAULT }}
-            thumbColor={rememberMe ? colors.success.DEFAULT : "#f4f3f4"}
-          />
-          <Text style={[styles.checkboxLabel, { color: colors.text.primary }]}>Beni Hatırla</Text>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: colors.primary[600] },
+        ]}
+      >
+        <View style={styles.header}>
+          <Text style={[styles.headerText, { color: colors.text.inverse }]}>
+            Welcome Back
+          </Text>
         </View>
 
-        <TouchableOpacity style={styles.forgotPassword}>
-          <Text style={[styles.forgotText, { color: colors.text.secondary }]}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
-          onPress={handleLogin}
-          disabled={loading}
+        <View
+          style={[styles.formArea, { backgroundColor: colors.surface[100] }]}
         >
-          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
-            {loading ? "Loading..." : "Login"}
-          </Text>
-        </TouchableOpacity>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.bg.DEFAULT,
+                color: colors.text.primary,
+              },
+            ]}
+            placeholder="Email Address"
+            placeholderTextColor={colors.text.secondary}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-        <Text style={[styles.or, { color: colors.text.secondary }]}>or</Text>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.bg.DEFAULT,
+                color: colors.text.primary,
+              },
+            ]}
+            placeholder="Password"
+            placeholderTextColor={colors.text.secondary}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-        <View style={styles.socialRow}>
-          <TouchableOpacity
-            onPress={handleGoogleLogin}
-            style={[styles.socialButton, { backgroundColor: colors.bg.DEFAULT }]}
-          >
-            <FontAwesome name="google" size={24} color="#DB4437" />
+          <View style={styles.checkboxRow}>
+            <Switch
+              value={rememberMe}
+              onValueChange={setRememberMe}
+              trackColor={{
+                false: colors.surface[100],
+                true: colors.primary.DEFAULT,
+              }}
+              thumbColor={rememberMe ? colors.success.DEFAULT : "#f4f3f4"}
+            />
+            <Text
+              style={[styles.checkboxLabel, { color: colors.text.primary }]}
+            >
+              Beni Hatırla
+            </Text>
+          </View>
+
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={[styles.forgotText, { color: colors.text.secondary }]}>
+              Forgot Password?
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleAppleLogin}
-            style={[styles.socialButton, { backgroundColor: colors.bg.DEFAULT }]}
+            style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
+            onPress={handleLogin}
+            disabled={loading}
           >
-            <AntDesign name="apple1" size={24} color={colors.text.primary} />
+            <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+              {loading ? "Loading..." : "Login"}
+            </Text>
+          </TouchableOpacity>
+
+          <Text style={[styles.or, { color: colors.text.secondary }]}>or</Text>
+
+          <View style={styles.socialRow}>
+            <TouchableOpacity
+              onPress={handleGoogleLogin}
+              style={[
+                styles.socialButton,
+                { backgroundColor: colors.bg.DEFAULT },
+              ]}
+            >
+              <FontAwesome name="google" size={24} color="#DB4437" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleAppleLogin}
+              style={[
+                styles.socialButton,
+                { backgroundColor: colors.bg.DEFAULT },
+              ]}
+            >
+              <AntDesign name="apple1" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+            <Text
+              style={[styles.registerText, { color: colors.text.secondary }]}
+            >
+              Don’t have an account?{" "}
+              <Text
+                style={[styles.registerLink, { color: colors.primary.DEFAULT }]}
+              >
+                Sign Up
+              </Text>
+            </Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-          <Text style={[styles.registerText, { color: colors.text.secondary }]}>
-            Don’t have an account?{" "}
-            <Text style={[styles.registerLink, { color: colors.primary.DEFAULT }]}>
-              Sign Up
-            </Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
   );
 }
 
