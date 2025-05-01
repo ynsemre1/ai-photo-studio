@@ -3,11 +3,9 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
 import { ThemeProvider, useTheme } from "../src/context/ThemeContext";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { getErrorMessage } from "../src/utils/getErrorMessage";
-import { sendEmailVerification } from "firebase/auth";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -27,9 +25,7 @@ export default function RootLayout() {
     if (!ready) return;
 
     const isAuthPage =
-      pathname === "/welcome" ||
-      pathname === "/login" ||
-      pathname === "/register";
+      pathname === "/welcome" || pathname === "/login" || pathname === "/register";
 
     const isProtectedRoute =
       pathname === "/" ||
@@ -39,40 +35,12 @@ export default function RootLayout() {
       pathname === "/profile";
 
     if (user) {
-      if (!user.emailVerified) {
-        if (!isAuthPage) {
-          Alert.alert(
-            "E-posta Doğrulama Gerekli",
-            "Lütfen e-posta adresinizi doğrulayın.",
-            [
-              {
-                text: "İptal",
-                style: "cancel",
-              },
-              {
-                text: "Yeniden Gönder",
-                onPress: async () => {
-                  try {
-                    await sendEmailVerification(user);
-                    Alert.alert("Başarılı", "Doğrulama e-postası tekrar gönderildi.");
-                  } catch (err) {
-                    Alert.alert("Hata", "E-posta gönderilemedi.");
-                  }
-                },
-              },
-            ],
-            { cancelable: false }
-          );
-          router.replace("/login");
-        }
-      } else {
-        if (isAuthPage) {
-          router.replace("/");
-        }
+      if (isAuthPage) {
+        router.replace("/");
       }
     } else {
       if (isProtectedRoute) {
-        router.replace("/welcome");
+        router.replace("/login");
       }
     }
   }, [ready, user, pathname]);

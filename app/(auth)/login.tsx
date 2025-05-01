@@ -7,8 +7,13 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
+  Alert,
 } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  sendEmailVerification,
+} from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -48,6 +53,43 @@ export default function LoginScreen() {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
 
+      const currentUser = auth.currentUser;
+
+      if (currentUser && !currentUser.emailVerified) {
+        const userToVerify = auth.currentUser;
+        await signOut(auth);
+
+        Alert.alert(
+          "E-posta Doğrulama Gerekli",
+          "Giriş yapabilmeniz için e-posta adresinizi doğrulamanız gerekiyor.",
+          [
+            { text: "İptal", style: "cancel" },
+            {
+              text: "Yeniden Gönder",
+              onPress: async () => {
+                try {
+                  if (userToVerify) {
+                    await sendEmailVerification(userToVerify);
+                    Alert.alert(
+                      "Gönderildi",
+                      "Doğrulama e-postası tekrar gönderildi."
+                    );
+                  } else {
+                    Alert.alert("Hata", "Kullanıcı bilgisi bulunamadı.");
+                  }
+                } catch (err) {
+                  Alert.alert("Hata", "E-posta gönderilemedi.");
+                  console.error(err);
+                }
+              },
+            },
+          ],
+          { cancelable: true }
+        );
+
+        return;
+      }
+
       if (rememberMe) {
         await AsyncStorage.setItem("email", email);
         await AsyncStorage.setItem("password", password);
@@ -55,9 +97,10 @@ export default function LoginScreen() {
         await AsyncStorage.removeItem("email");
         await AsyncStorage.removeItem("password");
       }
+
       router.replace("/");
     } catch (error: any) {
-      alert(getErrorMessage(error));
+      Alert.alert("Giriş Hatası", getErrorMessage(error));
     } finally {
       setLoading(false);
     }
