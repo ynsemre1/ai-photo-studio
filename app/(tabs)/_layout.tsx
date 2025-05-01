@@ -1,6 +1,5 @@
 import { Tabs } from "expo-router";
 import CustomNavBar from "../../src/components/navigation/CustomNavBar";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleDataProvider } from "../../src/context/StyleDataProvider";
 import { FavoriteProvider } from "../../src/context/FavoriteContext";
 
@@ -8,7 +7,6 @@ export default function TabsLayout() {
   return (
     <StyleDataProvider>
       <FavoriteProvider>
-        <SafeAreaView style={{ flex: 1 }}>
           <Tabs
             tabBar={(props) => <CustomNavBar {...props} />}
             screenOptions={{
@@ -24,7 +22,6 @@ export default function TabsLayout() {
             />
             <Tabs.Screen name="profileScreens" options={{ title: "Profile" }} />
           </Tabs>
-        </SafeAreaView>
       </FavoriteProvider>
     </StyleDataProvider>
   );

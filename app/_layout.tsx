@@ -3,33 +3,9 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
 import { ThemeProvider, useTheme } from "../src/context/ThemeContext";
-import { View, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-
-function ThemeSwitchButton() {
-  const { toggle, scheme } = useTheme();
-
-  return (
-    <TouchableOpacity
-      onPress={toggle}
-      style={{
-        position: "absolute",
-        top: 50,
-        right: 20,
-        zIndex: 999,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        padding: 8,
-        borderRadius: 20,
-      }}
-    >
-      <Ionicons
-        name={scheme === "dark" ? "sunny-outline" : "moon-outline"}
-        size={24}
-        color="#FFD700"
-      />
-    </TouchableOpacity>
-  );
-}
+import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -37,14 +13,13 @@ export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(
-    () =>
-      onAuthStateChanged(auth, (u) => {
-        setUser(u);
-        setReady(true);
-      }),
-    []
-  );
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setReady(true);
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     if (!ready) return;
@@ -74,10 +49,23 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <View style={{ flex: 1 }}>
-        <Slot />
-        <ThemeSwitchButton />
-      </View>
+      <ThemedRoot />
     </ThemeProvider>
+  );
+}
+
+function ThemedRoot() {
+  const { colors, scheme } = useTheme();
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg.DEFAULT }}>
+      <StatusBar
+        style={scheme === "dark" ? "light" : "dark"}
+        backgroundColor={colors.bg.DEFAULT}
+      />
+      <View style={{ flex: 1, backgroundColor: colors.bg.DEFAULT }}>
+        <Slot />
+      </View>
+    </SafeAreaView>
   );
 }
