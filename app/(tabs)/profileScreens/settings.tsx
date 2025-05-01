@@ -30,7 +30,7 @@ export default function SettingsScreen() {
   const handleSupport = () => {
     Alert.alert(
       "Destek",
-      "Lütfen support@example.com adresine e-posta gönderin."
+      "Lütfen 4.dort.studios@gmail.com adresine e-posta gönderin."
     );
   };
 
@@ -191,7 +191,7 @@ export default function SettingsScreen() {
           </Text>
           <TouchableOpacity style={styles.button} onPress={handleSupport}>
             <Text style={[styles.buttonText, { color: colors.text.primary }]}>
-              support@example.com
+              4.dort.studios@gmail.com
             </Text>
           </TouchableOpacity>
         </View>

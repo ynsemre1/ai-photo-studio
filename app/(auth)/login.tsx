@@ -17,6 +17,7 @@ import { loginWithApple } from "../../src/firebase/auth/appleLogin";
 import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useTheme } from "../../src/context/ThemeContext";
+import { getErrorMessage } from "../../src/utils/getErrorMessage";
 
 export default function LoginScreen() {
   const { colors } = useTheme();
@@ -56,7 +57,7 @@ export default function LoginScreen() {
       }
       router.replace("/");
     } catch (error: any) {
-      alert(error.message);
+      alert(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -71,12 +72,8 @@ export default function LoginScreen() {
   };
 
   return (
-      <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: colors.primary[600] },
-        ]}
-      >
+    <View style={{ flex: 1, backgroundColor: colors.primary[600] }}>
+      <ScrollView contentContainerStyle={[styles.container]}>
         <View style={styles.header}>
           <Text style={[styles.headerText, { color: colors.text.inverse }]}>
             Welcome Back
@@ -188,6 +185,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+    </View>
   );
 }
 

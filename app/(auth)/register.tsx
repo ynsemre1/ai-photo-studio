@@ -5,13 +5,13 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Image,
   ScrollView,
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../src/firebase/config";
 import { router } from "expo-router";
 import { useTheme } from "../../src/context/ThemeContext";
+import { getErrorMessage } from "../../src/utils/getErrorMessage";
 
 export default function RegisterScreen() {
   const { colors } = useTheme();
@@ -21,71 +21,94 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    if (!email || !password) {
+      alert("Lütfen e-posta ve şifreyi girin.");
+      return;
+    }
+
     try {
       setLoading(true);
       await createUserWithEmailAndPassword(auth, email, password);
-      router.replace("/"); // Başarılı olunca anasayfa
+      router.replace("/");
     } catch (error: any) {
-      alert(error.message);
+      alert(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.primary[600] }]}>
-      <View style={styles.header}>
-        <Text style={[styles.headerText, { color: colors.text.inverse }]}>Create Account</Text>
-        {/* <Image source={require('../../assets/signup.png')} style={styles.image} /> */}
-      </View>
-
-      <View style={[styles.formArea, { backgroundColor: colors.surface[100] }]}>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
-          placeholder="Email Address"
-          placeholderTextColor={colors.text.secondary}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.bg.DEFAULT, color: colors.text.primary }]}
-          placeholder="Password"
-          placeholderTextColor={colors.text.secondary}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
-          onPress={handleRegister}
-          disabled={loading}
-        >
-          <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
-            {loading ? "Creating..." : "Sign Up"}
+    <View style={{ flex: 1, backgroundColor: colors.primary[600] }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Text style={[styles.headerText, { color: colors.text.inverse }]}>
+            Create Account
           </Text>
-        </TouchableOpacity>
-
-        <Text style={[styles.or, { color: colors.text.secondary }]}>or</Text>
-
-        <View style={styles.socialRow}>
-          {/* <Image source={require('../../assets/google.png')} style={styles.icon} /> */}
-          {/* <Image source={require('../../assets/apple.png')} style={styles.icon} /> */}
         </View>
 
-        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text style={[styles.loginText, { color: colors.text.secondary }]}>
-            Already have an account?{" "}
-            <Text style={[styles.loginLink, { color: colors.primary.DEFAULT }]}>
-              Login
+        <View
+          style={[styles.formArea, { backgroundColor: colors.surface[100] }]}
+        >
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.bg.DEFAULT,
+                color: colors.text.primary,
+              },
+            ]}
+            placeholder="Email Address"
+            placeholderTextColor={colors.text.secondary}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <TextInput
+            style={[
+              styles.input,
+              {
+                backgroundColor: colors.bg.DEFAULT,
+                color: colors.text.primary,
+              },
+            ]}
+            placeholder="Password"
+            placeholderTextColor={colors.text.secondary}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+              {loading ? "Creating..." : "Sign Up"}
             </Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          </TouchableOpacity>
+
+          <Text style={[styles.or, { color: colors.text.secondary }]}>or</Text>
+
+          <View style={styles.socialRow}>
+            {/* Sosyal giriş butonları buraya eklenebilir */}
+          </View>
+
+          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+            <Text style={[styles.loginText, { color: colors.text.secondary }]}>
+              Already have an account?{" "}
+              <Text
+                style={[styles.loginLink, { color: colors.primary.DEFAULT }]}
+              >
+                Login
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -101,11 +124,6 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 28,
     fontWeight: "bold",
-  },
-  image: {
-    width: 200,
-    height: 200,
-    marginTop: 20,
   },
   formArea: {
     borderTopLeftRadius: 30,
@@ -137,11 +155,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 16,
     marginBottom: 20,
-  },
-  icon: {
-    width: 32,
-    height: 32,
-    marginHorizontal: 10,
   },
   loginText: {
     textAlign: "center",
