@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../src/firebase/config";
 import { ThemeProvider, useTheme } from "../src/context/ThemeContext";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { getErrorMessage } from "../src/utils/getErrorMessage";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -24,22 +25,34 @@ export default function RootLayout() {
   useEffect(() => {
     if (!ready) return;
 
+    const isAuthPage =
+      pathname === "/welcome" ||
+      pathname === "/login" ||
+      pathname === "/register";
+
+    const isProtectedRoute =
+      pathname === "/" ||
+      pathname === "/car" ||
+      pathname === "/style" ||
+      pathname === "/professional" ||
+      pathname === "/profile";
+
     if (user) {
-      if (
-        pathname === "/welcome" ||
-        pathname === "/login" ||
-        pathname === "/register"
-      ) {
-        router.replace("/");
+      if (!user.emailVerified) {
+        if (!isAuthPage) {
+          Alert.alert(
+            "E-posta Doğrulama Gerekli",
+            "Lütfen e-posta adresinizi doğrulayın."
+          );
+          router.replace("/login"); // ✨ yönlendirme eklendi
+        }
+      } else {
+        if (isAuthPage) {
+          router.replace("/");
+        }
       }
     } else {
-      if (
-        pathname === "/" ||
-        pathname === "/car" ||
-        pathname === "/style" ||
-        pathname === "/professional" ||
-        pathname === "/profile"
-      ) {
+      if (isProtectedRoute) {
         router.replace("/welcome");
       }
     }
