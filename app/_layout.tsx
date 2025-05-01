@@ -7,6 +7,7 @@ import { Alert, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { getErrorMessage } from "../src/utils/getErrorMessage";
+import { sendEmailVerification } from "firebase/auth";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -42,9 +43,27 @@ export default function RootLayout() {
         if (!isAuthPage) {
           Alert.alert(
             "E-posta Doğrulama Gerekli",
-            "Lütfen e-posta adresinizi doğrulayın."
+            "Lütfen e-posta adresinizi doğrulayın.",
+            [
+              {
+                text: "İptal",
+                style: "cancel",
+              },
+              {
+                text: "Yeniden Gönder",
+                onPress: async () => {
+                  try {
+                    await sendEmailVerification(user);
+                    Alert.alert("Başarılı", "Doğrulama e-postası tekrar gönderildi.");
+                  } catch (err) {
+                    Alert.alert("Hata", "E-posta gönderilemedi.");
+                  }
+                },
+              },
+            ],
+            { cancelable: false }
           );
-          router.replace("/login"); // ✨ yönlendirme eklendi
+          router.replace("/login");
         }
       } else {
         if (isAuthPage) {
