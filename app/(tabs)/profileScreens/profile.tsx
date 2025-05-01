@@ -12,7 +12,7 @@ import {
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../../src/firebase/config";
+import { db, dbUsers } from "../../../src/firebase/config";
 import { useFavorites } from "../../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,25 +35,28 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (!user) return;
-
+  
     const fetchData = async () => {
       try {
-        const docRef = doc(db, "users", user.uid);
+        const docRef = doc(dbUsers, "users", user.uid); // ✅ doğru database burada olmalı
         const snap = await getDoc(docRef);
+  
         if (snap.exists()) {
-          setUserInfo(snap.data());
+          const data = snap.data();
+          setUserInfo({ name: data.name, surname: data.surname });
+        } else {
+          console.log("⚠️ Belge bulunamadı.");
         }
-
+  
         const localUris = await getRecentGeneratedImages(user.uid);
-        localUris.reverse();
-        setImages(localUris);
+        setImages(localUris.reverse());
       } catch (err) {
         console.log("🔥 Hata:", err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [user]);
 
@@ -70,11 +73,17 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}>
-      <View style={[styles.headerContainer, { backgroundColor: colors.bg.DEFAULT }]}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}
+    >
+      <View
+        style={[styles.headerContainer, { backgroundColor: colors.bg.DEFAULT }]}
+      >
         <View style={styles.headerTop}>
           <Text style={[styles.username, { color: colors.text.primary }]}>
-            {userInfo?.username || "Yunus Emre[MOCK]"}
+            {userInfo?.name && userInfo?.surname
+              ? `${userInfo.name} ${userInfo.surname}`
+              : "Yunus Emre [MOCK]"}
           </Text>
           <Text style={[styles.email, { color: colors.text.secondary }]}>
             {userInfo?.email || user.email}
@@ -88,7 +97,15 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.statsCard, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100] }]}>
+        <View
+          style={[
+            styles.statsCard,
+            {
+              backgroundColor:
+                scheme === "dark" ? colors.surface[100] : colors.primary[100],
+            },
+          ]}
+        >
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
               {userInfo?.coins || 0}
@@ -126,7 +143,10 @@ export default function ProfileScreen() {
             <Image source={{ uri: item }} style={styles.imageItem} />
           </TouchableOpacity>
         )}
-        contentContainerStyle={[styles.gridContainer, { backgroundColor: colors.bg.DEFAULT }]}
+        contentContainerStyle={[
+          styles.gridContainer,
+          { backgroundColor: colors.bg.DEFAULT },
+        ]}
         showsVerticalScrollIndicator={false}
       />
 
