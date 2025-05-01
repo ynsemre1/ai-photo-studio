@@ -43,7 +43,7 @@ export default function ProfileScreen() {
   
         if (snap.exists()) {
           const data = snap.data();
-          setUserInfo({ name: data.name, surname: data.surname });
+          setUserInfo({ name: data.name, surname: data.surname, coin: data.coin });
         } else {
           console.log("⚠️ Belge bulunamadı.");
         }
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
         >
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              {userInfo?.coins || 0}
+              {userInfo?.coin || 0}
             </Text>
             <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
               Coins
