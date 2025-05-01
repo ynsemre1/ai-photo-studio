@@ -71,7 +71,6 @@ export default function RegisterScreen() {
         "E-posta Doğrulama",
         "Kayıt başarılı. Giriş yapmadan önce e-postanı doğrulaman gerekiyor. Gelen kutunu kontrol et."
       );
-
       router.replace("/(auth)/login");
     } catch (error) {
       Alert.alert("Hata", getErrorMessage(error));

@@ -33,7 +33,6 @@ export default function ProfileScreen() {
   const { favorites } = useFavorites();
   const router = useRouter();
 
-  // İlk yüklemede sabit bilgileri alıyoruz
   useEffect(() => {
     if (!user) return;
 
@@ -51,13 +50,13 @@ export default function ProfileScreen() {
             email: data.email || user.email,
           });
         } else {
-          console.log("⚠️ Belge bulunamadı.");
+          console.log("[ERROR]: DOCUMENT NOT FOUND");
         }
 
         const localUris = await getRecentGeneratedImages(user.uid);
         setImages(localUris.reverse());
       } catch (err) {
-        console.log("🔥 Hata:", err);
+        console.log("[ERROR]:", err);
       } finally {
         setLoading(false);
       }

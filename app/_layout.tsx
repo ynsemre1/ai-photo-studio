@@ -21,29 +21,36 @@ export default function RootLayout() {
     return unsub;
   }, []);
 
-  useEffect(() => {
-    if (!ready) return;
+  const [hasRedirected, setHasRedirected] = useState(false);
 
-    const isAuthPage =
-      pathname === "/welcome" || pathname === "/login" || pathname === "/register";
+useEffect(() => {
+  if (!ready) return;
+  
+  const isAuthPage =
+    pathname === "/welcome" || pathname === "/login" || pathname === "/register";
 
-    const isProtectedRoute =
-      pathname === "/" ||
-      pathname === "/car" ||
-      pathname === "/style" ||
-      pathname === "/professional" ||
-      pathname === "/profile";
+  const isProtectedRoute =
+    pathname === "/" ||
+    pathname === "/car" ||
+    pathname === "/style" ||
+    pathname === "/professional" ||
+    pathname === "/profile";
 
-    if (user) {
-      if (isAuthPage) {
-        router.replace("/");
-      }
-    } else {
-      if (isProtectedRoute) {
-        router.replace("/login");
-      }
+  if (user) {
+    if (!user.emailVerified && pathname !== "/(auth)/login" && !hasRedirected) {
+      setHasRedirected(true);
+      router.replace("/(auth)/login");
+    } else if (user.emailVerified && isAuthPage && !hasRedirected) {
+      setHasRedirected(true);
+      router.replace("/");
     }
-  }, [ready, user, pathname]);
+  } else {
+    if (isProtectedRoute && !hasRedirected) {
+      setHasRedirected(true);
+      router.replace("/(auth)/welcome");
+    }
+  }
+}, [ready, user, pathname]);
 
   if (!ready) return null;
 
