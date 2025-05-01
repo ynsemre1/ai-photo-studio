@@ -35,19 +35,23 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (!user) return;
-  
+
     const fetchData = async () => {
       try {
         const docRef = doc(dbUsers, "users", user.uid); // ✅ doğru database burada olmalı
         const snap = await getDoc(docRef);
-  
+
         if (snap.exists()) {
           const data = snap.data();
-          setUserInfo({ name: data.name, surname: data.surname, coin: data.coin });
+          setUserInfo({
+            name: data.name,
+            surname: data.surname,
+            coin: data.coin,
+          });
         } else {
           console.log("⚠️ Belge bulunamadı.");
         }
-  
+
         const localUris = await getRecentGeneratedImages(user.uid);
         setImages(localUris.reverse());
       } catch (err) {
@@ -56,7 +60,7 @@ export default function ProfileScreen() {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [user]);
 
@@ -124,7 +128,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              {userInfo?.generatedCount || 0}
+              {images?.length || 0}{" "}
             </Text>
             <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
               Üretimler

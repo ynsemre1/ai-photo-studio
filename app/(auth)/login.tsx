@@ -23,6 +23,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { useTheme } from "../../src/context/ThemeContext";
 import { getErrorMessage } from "../../src/utils/getErrorMessage";
+import { syncGeneratedImagesFromStorage } from "../../src/utils/saveGeneratedImage";
+
 
 export default function LoginScreen() {
   const { colors } = useTheme();
@@ -96,6 +98,10 @@ export default function LoginScreen() {
       } else {
         await AsyncStorage.removeItem("email");
         await AsyncStorage.removeItem("password");
+      }
+
+      if (currentUser?.uid) {
+        await syncGeneratedImagesFromStorage(currentUser.uid);
       }
 
       router.replace("/");
