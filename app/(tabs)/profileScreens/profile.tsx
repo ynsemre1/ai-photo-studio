@@ -83,7 +83,7 @@ export default function ProfileScreen() {
           <Text style={[styles.username, { color: colors.text.primary }]}>
             {userInfo?.name && userInfo?.surname
               ? `${userInfo.name} ${userInfo.surname}`
-              : "Yunus Emre [MOCK]"}
+              : "Your Name"}
           </Text>
           <Text style={[styles.email, { color: colors.text.secondary }]}>
             {userInfo?.email || user.email}
