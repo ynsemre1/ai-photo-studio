@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import { doc, getDoc } from "firebase/firestore";
-import { db, dbUsers } from "../../../src/firebase/config";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { dbUsers } from "../../../src/firebase/config";
 import { useFavorites } from "../../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,12 +33,13 @@ export default function ProfileScreen() {
   const { favorites } = useFavorites();
   const router = useRouter();
 
+  // İlk yüklemede sabit bilgileri alıyoruz
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
       try {
-        const docRef = doc(dbUsers, "users", user.uid); // ✅ doğru database burada olmalı
+        const docRef = doc(dbUsers, "users", user.uid);
         const snap = await getDoc(docRef);
 
         if (snap.exists()) {
@@ -47,6 +48,7 @@ export default function ProfileScreen() {
             name: data.name,
             surname: data.surname,
             coin: data.coin,
+            email: data.email || user.email,
           });
         } else {
           console.log("⚠️ Belge bulunamadı.");
@@ -62,6 +64,24 @@ export default function ProfileScreen() {
     };
 
     fetchData();
+  }, [user]);
+
+  // Sadece coin değeri dinleniyor
+  useEffect(() => {
+    if (!user) return;
+
+    const docRef = doc(dbUsers, "users", user.uid);
+    const unsubscribe = onSnapshot(docRef, (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setUserInfo((prev: any) => ({
+          ...prev,
+          coin: data.coin,
+        }));
+      }
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   const handleGoSettings = () => {
@@ -90,7 +110,7 @@ export default function ProfileScreen() {
               : "Your Name"}
           </Text>
           <Text style={[styles.email, { color: colors.text.secondary }]}>
-            {userInfo?.email || user.email}
+            {userInfo?.email}
           </Text>
 
           <TouchableOpacity
@@ -112,7 +132,7 @@ export default function ProfileScreen() {
         >
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              {userInfo?.coin || 0}
+              {userInfo?.coin ?? 0}
             </Text>
             <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
               Coins
@@ -128,7 +148,7 @@ export default function ProfileScreen() {
           </View>
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              {images?.length || 0}{" "}
+              {images?.length || 0}
             </Text>
             <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
               Üretimler
