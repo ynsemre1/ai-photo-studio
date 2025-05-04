@@ -22,7 +22,7 @@ import { useTheme } from "../../../src/context/ThemeContext";
 import Dialog from "react-native-dialog";
 import { deleteDoc, doc, collection, getDocs } from "firebase/firestore";
 import { deleteObject, listAll, ref } from "firebase/storage";
-import { db, dbUsers, storage } from "../../../src/firebase/config";
+import { db, storage } from "../../../src/firebase/config";
 
 export default function SettingsScreen() {
   const auth = getAuth();
@@ -75,7 +75,7 @@ export default function SettingsScreen() {
       const uid = user.uid;
 
       // Firestore: kullanıcı bilgisi sil
-      await deleteDoc(doc(dbUsers, "users", uid));
+      await deleteDoc(doc(db, "users", uid));
 
       // Storage: generatedImages/{uid} sil
       const generatedRef = ref(storage, `generatedImages/${uid}`);

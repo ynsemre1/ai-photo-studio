@@ -12,7 +12,7 @@ import {
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
-import { dbUsers } from "../../../src/firebase/config";
+import { db } from "../../../src/firebase/config";
 import { useFavorites } from "../../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -38,7 +38,7 @@ export default function ProfileScreen() {
 
     const fetchData = async () => {
       try {
-        const docRef = doc(dbUsers, "users", user.uid);
+        const docRef = doc(db, "users", user.uid);
         const snap = await getDoc(docRef);
 
         if (snap.exists()) {
@@ -69,7 +69,7 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (!user) return;
 
-    const docRef = doc(dbUsers, "users", user.uid);
+    const docRef = doc(db, "users", user.uid);
     const unsubscribe = onSnapshot(docRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data();

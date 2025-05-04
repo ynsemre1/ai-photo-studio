@@ -14,7 +14,7 @@ import {
   sendEmailVerification,
   signOut,
 } from "firebase/auth";
-import { auth, db, dbUsers } from "../../src/firebase/config";
+import { auth, db } from "../../src/firebase/config";
 import { doc, setDoc } from "firebase/firestore";
 import { router } from "expo-router";
 import { useTheme } from "../../src/context/ThemeContext";
@@ -57,7 +57,7 @@ export default function RegisterScreen() {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      await setDoc(doc(dbUsers, "users", uid), {
+      await setDoc(doc(db, "users", uid), {
         name,
         surname,
         birthdate: birthdate.toISOString(),

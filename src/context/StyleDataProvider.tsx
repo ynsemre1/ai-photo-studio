@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { collection, onSnapshot, getDocs } from "firebase/firestore";
-import { db, storage } from "../firebase/config";
-import { getAuth } from "firebase/auth";
-import { getDownloadURL, ref } from "firebase/storage";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db, storage, auth } from "../firebase/config";
+import { getDownloadURL, ref as storageRef } from "firebase/storage";
 
 type StyleItem = { filename: string; value: string; uri: string };
 type StyleData = {
@@ -23,11 +22,10 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
   });
 
   useEffect(() => {
-    const uid = getAuth().currentUser?.uid;
+    const uid = auth.currentUser?.uid;
     if (!uid) return;
 
     const unsubscribeFns: Array<() => void> = [];
-
     const types = ["style", "car", "professional"] as const;
 
     types.forEach((type) => {
@@ -38,27 +36,32 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
 
         const enrichedData = await Promise.all(
           snap.docs.map(async (doc) => {
-            const data = doc.data();
-            const path = `styles/${type}/${data.filename}`;
+            const docData = doc.data();
+            const path = `styles/${type}/${docData.filename}`;
+
             try {
-              const uri = await getDownloadURL(ref(storage, path));
-              return { ...data, uri } as StyleItem;
+              const uri = await getDownloadURL(storageRef(storage, path));
+              return { ...docData, uri } as StyleItem;
             } catch (err) {
               console.log("🚫 URI alınamadı:", path);
+              console.log("Hata Detayı:", JSON.stringify(err)); // 👈 bunu da ekle
               return null;
             }
           })
         );
 
+        const filtered = enrichedData.filter(Boolean) as StyleItem[];
+
         setData((prev) => ({
           ...prev,
-          [type]: enrichedData.filter(Boolean) as StyleItem[],
+          [type]: filtered,
         }));
 
         const newCache = {
           ...data,
-          [type]: enrichedData.filter(Boolean),
+          [type]: filtered,
         };
+
         await AsyncStorage.setItem("styleData", JSON.stringify(newCache));
       });
 
