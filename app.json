@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "gpt-creative-studio",
-    "slug": "gpt-creative-studio",
-    "scheme": "gptstudio",
-    "version": "1.0.0",
+    "name": "AI Photo Studio",
+    "slug": "ai-photo-studio",
+    "scheme": "aiphotostudio",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.studio.image.generator",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./google-services.json"
     },
     "android": {
       "package": "com.fourstudios.generateai",
