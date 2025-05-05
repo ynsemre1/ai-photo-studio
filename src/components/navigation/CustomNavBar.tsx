@@ -26,7 +26,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
 
   const renderTab = (route: any, index: number) => {
     if (
-      ["_sitemap", "+not-found", "upload-image", "index"].includes(route.name)
+      ["_sitemap", "+not-found", "upload-image", "index", "purchase"].includes(route.name)
     )
       return null;
 
