@@ -153,7 +153,7 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={{ flex: 1, backgroundColor: colors.primary[600] }}>
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps="handled"
         >
@@ -161,7 +161,9 @@ export default function LoginScreen() {
             <Text style={[styles.headerText, { color: colors.text.inverse }]}>
               Welcome Back
             </Text>
-            <Text style={[styles.headerSubtext, { color: colors.text.inverse }]}>
+            <Text
+              style={[styles.headerSubtext, { color: colors.text.inverse }]}
+            >
               Sign in to continue
             </Text>
           </View>
@@ -170,18 +172,22 @@ export default function LoginScreen() {
             style={[styles.formArea, { backgroundColor: colors.surface[100] }]}
           >
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>
+              <Text
+                style={[styles.inputLabel, { color: colors.text.secondary }]}
+              >
                 Email Address
               </Text>
-              <View style={[
-                styles.inputWrapper,
-                { backgroundColor: colors.bg.DEFAULT }
-              ]}>
-                <AntDesign 
-                  name="mail" 
-                  size={20} 
-                  color={colors.text.secondary} 
-                  style={styles.inputIcon} 
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { backgroundColor: colors.bg.DEFAULT },
+                ]}
+              >
+                <AntDesign
+                  name="mail"
+                  size={20}
+                  color={colors.text.secondary}
+                  style={styles.inputIcon}
                 />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
@@ -196,18 +202,22 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>
+              <Text
+                style={[styles.inputLabel, { color: colors.text.secondary }]}
+              >
                 Password
               </Text>
-              <View style={[
-                styles.inputWrapper,
-                { backgroundColor: colors.bg.DEFAULT }
-              ]}>
-                <AntDesign 
-                  name="lock" 
-                  size={20} 
-                  color={colors.text.secondary} 
-                  style={styles.inputIcon} 
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { backgroundColor: colors.bg.DEFAULT },
+                ]}
+              >
+                <AntDesign
+                  name="lock"
+                  size={20}
+                  color={colors.text.secondary}
+                  style={styles.inputIcon}
                 />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
@@ -217,14 +227,14 @@ export default function LoginScreen() {
                   onChangeText={setPassword}
                   secureTextEntry={secureTextEntry}
                 />
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => setSecureTextEntry(!secureTextEntry)}
                   style={styles.eyeIcon}
                 >
-                  <AntDesign 
-                    name={secureTextEntry ? "eyeo" : "eye"} 
-                    size={20} 
-                    color={colors.text.secondary} 
+                  <AntDesign
+                    name={secureTextEntry ? "eyeo" : "eye"}
+                    size={20}
+                    color={colors.text.secondary}
                   />
                 </TouchableOpacity>
               </View>
@@ -248,31 +258,54 @@ export default function LoginScreen() {
                 </Text>
               </View>
 
-              <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={[styles.forgotText, { color: colors.primary.DEFAULT }]}>
+              <TouchableOpacity
+                onPress={() => router.push("/(auth)/forgot-password")}
+              >
+                <Text
+                  style={[styles.forgotText, { color: colors.primary.DEFAULT }]}
+                >
                   Forgot Password?
                 </Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: colors.success.DEFAULT }]}
+              style={[
+                styles.button,
+                { backgroundColor: colors.success.DEFAULT },
+              ]}
               onPress={handleLogin}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color={colors.text.inverse} />
               ) : (
-                <Text style={[styles.buttonText, { color: colors.text.inverse }]}>
+                <Text
+                  style={[styles.buttonText, { color: colors.text.inverse }]}
+                >
                   Sign In
                 </Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.divider}>
-              <View style={[styles.dividerLine, { backgroundColor: colors.text.secondary }]} />
-              <Text style={[styles.dividerText, { color: colors.text.secondary }]}>or continue with</Text>
-              <View style={[styles.dividerLine, { backgroundColor: colors.text.secondary }]} />
+              <View
+                style={[
+                  styles.dividerLine,
+                  { backgroundColor: colors.text.secondary },
+                ]}
+              />
+              <Text
+                style={[styles.dividerText, { color: colors.text.secondary }]}
+              >
+                or continue with
+              </Text>
+              <View
+                style={[
+                  styles.dividerLine,
+                  { backgroundColor: colors.text.secondary },
+                ]}
+              />
             </View>
 
             <View style={styles.socialRow}>
@@ -284,7 +317,14 @@ export default function LoginScreen() {
                 ]}
               >
                 <FontAwesome name="google" size={20} color="#DB4437" />
-                <Text style={[styles.socialButtonText, { color: colors.text.primary }]}>Google</Text>
+                <Text
+                  style={[
+                    styles.socialButtonText,
+                    { color: colors.text.primary },
+                  ]}
+                >
+                  Google
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -294,17 +334,35 @@ export default function LoginScreen() {
                   { backgroundColor: colors.bg.DEFAULT },
                 ]}
               >
-                <AntDesign name="apple1" size={20} color={colors.text.primary} />
-                <Text style={[styles.socialButtonText, { color: colors.text.primary }]}>Apple</Text>
+                <AntDesign
+                  name="apple1"
+                  size={20}
+                  color={colors.text.primary}
+                />
+                <Text
+                  style={[
+                    styles.socialButtonText,
+                    { color: colors.text.primary },
+                  ]}
+                >
+                  Apple
+                </Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>
-              <Text style={[styles.registerText, { color: colors.text.secondary }]}>
+              <Text
+                style={[styles.registerText, { color: colors.text.secondary }]}
+              >
                 Don't have an account?
               </Text>
               <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-                <Text style={[styles.registerLink, { color: colors.primary.DEFAULT }]}>
+                <Text
+                  style={[
+                    styles.registerLink,
+                    { color: colors.primary.DEFAULT },
+                  ]}
+                >
                   Sign Up
                 </Text>
               </TouchableOpacity>
@@ -317,7 +375,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     flexGrow: 1,
   },
   header: {
