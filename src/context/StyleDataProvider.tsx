@@ -4,7 +4,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db, storage, auth } from "../firebase/config";
 import { getDownloadURL, ref as storageRef } from "firebase/storage";
 
-type StyleItem = { filename: string; value: string; uri: string };
+type StyleItem = { file_name: string; value: string; uri: string };
 type StyleData = {
   style: StyleItem[];
   car: StyleItem[];
@@ -37,14 +37,14 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
         const enrichedData = await Promise.all(
           snap.docs.map(async (doc) => {
             const docData = doc.data();
-            const path = `styles/${type}/${docData.filename}`;
+            const path = `styles/${type}/${docData.file_name}`;
 
             try {
               const uri = await getDownloadURL(storageRef(storage, path));
               return { ...docData, uri } as StyleItem;
             } catch (err) {
               console.log("🚫 URI alınamadı:", path);
-              console.log("Hata Detayı:", JSON.stringify(err)); // 👈 bunu da ekle
+              console.log("Hata Detayı:", JSON.stringify(err));
               return null;
             }
           })
