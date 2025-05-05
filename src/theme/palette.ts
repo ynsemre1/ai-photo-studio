@@ -12,56 +12,56 @@
  * 12‑step scale similar to Tailwind.
  */
 export interface ColorScale {
-  DEFAULT: string;
-  50: string;
-  100: string;
-  200: string;
-  300: string;
-  400: string;
-  500: string;
-  600: string;
-  700: string;
-  800: string;
-  900: string;
-  950: string;
+  DEFAULT: string
+  50: string
+  100: string
+  200: string
+  300: string
+  400: string
+  500: string
+  600: string
+  700: string
+  800: string
+  900: string
+  950: string
 }
 
 export interface ColorPalette {
-  primary: ColorScale;
-  error: { DEFAULT: string };
-  success: { DEFAULT: string };
-  bg: { DEFAULT: string };
-  surface: { 100: string };
-  text: { primary: string; secondary: string; inverse: string };
+  primary: ColorScale
+  error: { DEFAULT: string }
+  success: { DEFAULT: string }
+  bg: { DEFAULT: string }
+  surface: { 100: string }
+  text: { primary: string; secondary: string; inverse: string }
 }
 
 const primaryScale: ColorScale = {
-  DEFAULT: "#3FC1F2",
-  50:  "#F2FCFF",
-  100: "#D6F7FF",
-  200: "#ADEEFF",
-  300: "#7FE0FB",
-  400: "#50D3F7",
-  500: "#3FC1F2",
-  600: "#30A5D6",
-  700: "#2188B9",
-  800: "#146C9C",
-  900: "#0B567D",
-  950: "#063F5E",
-};
+  DEFAULT: "#4F46E5", // More vibrant indigo as primary color
+  50: "#EEF2FF",
+  100: "#E0E7FF",
+  200: "#C7D2FE",
+  300: "#A5B4FC",
+  400: "#818CF8",
+  500: "#6366F1",
+  600: "#4F46E5",
+  700: "#4338CA",
+  800: "#3730A3",
+  900: "#312E81",
+  950: "#1E1B4B",
+}
 
 export const lightTheme: ColorPalette = {
   primary: primaryScale,
-  error: { DEFAULT: "#FF5A5F" }, 
-  success: { DEFAULT: "#00D26A" }, 
-  bg: { DEFAULT: "#F0FAFF" },
-  surface: { 100: "#F9FBFD" }, 
+  error: { DEFAULT: "#EF4444" }, // Brighter red for errors
+  success: { DEFAULT: "#10B981" }, // Emerald green for success
+  bg: { DEFAULT: "#F8FAFC" }, // Lighter background
+  surface: { 100: "#FFFFFF" }, // Pure white surface
   text: {
-    primary: "#0F172A", 
-    secondary: "#64748B",
-    inverse: "#FFFFFF",
+    primary: "#1E293B", // Slate-800 for better readability
+    secondary: "#64748B", // Slate-500 for secondary text
+    inverse: "#FFFFFF", // White for text on dark backgrounds
   },
-};
+}
 
 const primaryDark: ColorScale = {
   ...primaryScale,
@@ -71,7 +71,7 @@ const primaryDark: ColorScale = {
   600: "#30A5D6",
   700: "#2188B9",
   800: "#146C9C",
-};
+}
 
 export const darkTheme: ColorPalette = {
   primary: primaryDark,
@@ -84,11 +84,10 @@ export const darkTheme: ColorPalette = {
     secondary: "#94A3B8",
     inverse: "#0A0A12",
   },
-};
+}
 
 export const getColor = <G extends keyof ColorPalette, S extends keyof ColorPalette[G]>(
   palette: ColorPalette,
   group: G,
   shade: S,
-): string => palette[group][shade] as unknown as string;
-  
+): string => palette[group][shade] as unknown as string

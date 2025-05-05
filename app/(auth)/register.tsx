@@ -21,9 +21,10 @@ import { useTheme } from "../../src/context/ThemeContext"
 import { getErrorMessage } from "../../src/utils/getErrorMessage"
 import DateTimePicker from "@react-native-community/datetimepicker"
 import { AntDesign, Feather } from "@expo/vector-icons"
+import { LinearGradient } from "expo-linear-gradient"
 
 export default function RegisterScreen() {
-  const { colors } = useTheme()
+  const { colors, scheme } = useTheme()
 
   const [name, setName] = useState("")
   const [surname, setSurname] = useState("")
@@ -85,18 +86,33 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <View style={{ flex: 1, backgroundColor: colors.primary[600] }}>
+      <LinearGradient
+        colors={
+          scheme === "dark"
+            ? [colors.bg.DEFAULT, colors.primary[900]]
+            : [colors.primary[100], colors.primary[200]]
+        }
+        style={styles.gradient}
+      >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          >
+            <Feather name="arrow-left" size={24} color={colors.text.primary} />
+          </TouchableOpacity>
+          
           <View style={styles.header}>
-            <Text style={[styles.headerText, { color: colors.text.inverse }]}>Create Account</Text>
-            <Text style={[styles.headerSubtext, { color: colors.text.inverse }]}>Sign up to get started</Text>
+            <Text style={[styles.headerText, { color: colors.text.primary }]}>Create Account</Text>
+            <Text style={[styles.headerSubtext, { color: colors.text.secondary }]}>Sign up to get started</Text>
           </View>
 
-          <View style={[styles.formArea, { backgroundColor: colors.surface[100] }]}>
+          <View style={[styles.formArea, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.bg.DEFAULT }]}>
             <View style={styles.nameRow}>
               <View style={[styles.inputContainer, { flex: 1 }]}>
                 <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>First Name</Text>
-                <View style={[styles.inputWrapper, { backgroundColor: colors.bg.DEFAULT }]}>
+                <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
                   <TextInput
                     style={[styles.input, { color: colors.text.primary }]}
                     placeholder="First Name"
@@ -109,7 +125,7 @@ export default function RegisterScreen() {
 
               <View style={[styles.inputContainer, { flex: 1 }]}>
                 <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Last Name</Text>
-                <View style={[styles.inputWrapper, { backgroundColor: colors.bg.DEFAULT }]}>
+                <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
                   <TextInput
                     style={[styles.input, { color: colors.text.primary }]}
                     placeholder="Last Name"
@@ -123,7 +139,7 @@ export default function RegisterScreen() {
 
             <View style={styles.inputContainer}>
               <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Email Address</Text>
-              <View style={[styles.inputWrapper, { backgroundColor: colors.bg.DEFAULT }]}>
+              <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
                 <AntDesign name="mail" size={20} color={colors.text.secondary} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
@@ -139,7 +155,7 @@ export default function RegisterScreen() {
 
             <View style={styles.inputContainer}>
               <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Password</Text>
-              <View style={[styles.inputWrapper, { backgroundColor: colors.bg.DEFAULT }]}>
+              <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
                 <AntDesign name="lock" size={20} color={colors.text.secondary} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
@@ -157,7 +173,7 @@ export default function RegisterScreen() {
 
             <View style={styles.inputContainer}>
               <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Confirm Password</Text>
-              <View style={[styles.inputWrapper, { backgroundColor: colors.bg.DEFAULT }]}>
+              <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
                 <AntDesign name="lock" size={20} color={colors.text.secondary} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
@@ -179,14 +195,14 @@ export default function RegisterScreen() {
             <View style={styles.inputContainer}>
               <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Date of Birth</Text>
               <TouchableOpacity
-                style={[styles.inputWrapper, { backgroundColor: colors.bg.DEFAULT }]}
+                style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}
                 onPress={() => setShowDatePicker(true)}
               >
                 <Feather name="calendar" size={20} color={colors.text.secondary} style={styles.inputIcon} />
                 <Text
                   style={{
                     flex: 1,
-                    padding: 14,
+                    padding: 16,
                     fontSize: 15,
                     color: birthdate ? colors.text.primary : colors.text.secondary,
                   }}
@@ -210,17 +226,21 @@ export default function RegisterScreen() {
               style={[
                 styles.button,
                 {
-                  backgroundColor: colors.success.DEFAULT,
+                  backgroundColor: colors.primary.DEFAULT,
                   marginTop: 12,
                 },
               ]}
               onPress={handleRegister}
               disabled={loading}
+              activeOpacity={0.8}
             >
               {loading ? (
                 <ActivityIndicator color={colors.text.inverse} />
               ) : (
-                <Text style={[styles.buttonText, { color: colors.text.inverse }]}>Create Account</Text>
+                <>
+                  <Text style={[styles.buttonText, { color: colors.text.inverse }]}>Create Account</Text>
+                  <Feather name="user-plus" size={20} color={colors.text.inverse} />
+                </>
               )}
             </TouchableOpacity>
 
@@ -232,27 +252,37 @@ export default function RegisterScreen() {
             </View>
           </View>
         </ScrollView>
-      </View>
+      </LinearGradient>
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
+    paddingTop: 40,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
   },
   header: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 40,
+    paddingVertical: 60,
   },
   headerText: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
     marginBottom: 8,
   },
   headerSubtext: {
-    fontSize: 16,
+    fontSize: 18,
     opacity: 0.8,
   },
   formArea: {
@@ -275,13 +305,14 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "600",
     marginBottom: 8,
+    marginLeft: 4,
   },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: "hidden",
   },
   inputIcon: {
@@ -289,17 +320,25 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    padding: 14,
+    padding: 16,
     fontSize: 15,
   },
   eyeIcon: {
     paddingHorizontal: 14,
   },
   button: {
+    flexDirection: "row",
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 16,
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 24,
+    gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
   },
   buttonText: {
     fontSize: 16,
