@@ -11,14 +11,14 @@ import {
 } from "react-native";
 import { getAuth } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
-import { db } from "../../../src/firebase/config";
 import { useFavorites } from "../../../src/context/FavoriteContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../../src/context/ThemeContext";
 import ImagePreviewModal from "../../../src/components/ImagePreviewModal";
 import { getRecentGeneratedImages } from "../../../src/utils/saveGeneratedImage";
+import { useCoin } from "../../../src/context/CoinContext";
+import { useUser } from "../../../src/context/UserContext";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -26,68 +26,36 @@ export default function ProfileScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
   const { colors, scheme } = useTheme();
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const { favorites } = useFavorites();
+  const { coin } = useCoin();
+  const { userData, loading: userLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
     if (!user) return;
 
-    const fetchData = async () => {
+    const fetchImages = async () => {
       try {
-        const docRef = doc(db, "users", user.uid);
-        const snap = await getDoc(docRef);
-
-        if (snap.exists()) {
-          const data = snap.data();
-          setUserInfo({
-            name: data.name,
-            surname: data.surname,
-            coin: data.coin,
-            email: data.email || user.email,
-          });
-        } else {
-          console.log("[ERROR]: DOCUMENT NOT FOUND");
-        }
-
         const localUris = await getRecentGeneratedImages(user.uid);
         setImages(localUris.reverse());
       } catch (err) {
-        console.log("[ERROR]:", err);
+        console.log("[ERROR - fetchImages]:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [user]);
-
-  // Sadece coin değeri dinleniyor
-  useEffect(() => {
-    if (!user) return;
-
-    const docRef = doc(db, "users", user.uid);
-    const unsubscribe = onSnapshot(docRef, (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        setUserInfo((prev: any) => ({
-          ...prev,
-          coin: data.coin,
-        }));
-      }
-    });
-
-    return () => unsubscribe();
+    fetchImages();
   }, [user]);
 
   const handleGoSettings = () => {
     router.push("/profileScreens/settings");
   };
 
-  if (!user || loading) {
+  if (!user || loading || userLoading) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.DEFAULT }]}>
         <ActivityIndicator size="large" color={colors.text.inverse} />
@@ -99,17 +67,15 @@ export default function ProfileScreen() {
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}
     >
-      <View
-        style={[styles.headerContainer, { backgroundColor: colors.bg.DEFAULT }]}
-      >
+      <View style={[styles.headerContainer]}>
         <View style={styles.headerTop}>
           <Text style={[styles.username, { color: colors.text.primary }]}>
-            {userInfo?.name && userInfo?.surname
-              ? `${userInfo.name} ${userInfo.surname}`
+            {userData?.name && userData?.surname
+              ? `${userData.name} ${userData.surname}`
               : "Your Name"}
           </Text>
           <Text style={[styles.email, { color: colors.text.secondary }]}>
-            {userInfo?.email}
+            {userData?.email}
           </Text>
 
           <TouchableOpacity
@@ -131,7 +97,7 @@ export default function ProfileScreen() {
         >
           <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: colors.text.primary }]}>
-              {userInfo?.coin ?? 0}
+              {coin}
             </Text>
             <Text style={[styles.statLabel, { color: colors.text.secondary }]}>
               Coins
