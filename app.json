@@ -20,9 +20,7 @@
     "android": {
       "package": "com.fourstudios.generateai",
       "googleServicesFile": "./google-services.json",
-      "permissions": [
-        "com.android.vending.BILLING"
-      ],
+      "permissions": ["com.android.vending.BILLING"],
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

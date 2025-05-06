@@ -14,7 +14,6 @@ const getStorageKey = async (uid: string) => {
   return `recentGeneratedImages_${hash.substring(0, 12)}`;
 };
 
-// Kullanıcının Storage'daki tüm geçmiş fotoğraflarını çekip local'e kaydeder
 export const syncGeneratedImagesFromStorage = async (uid: string) => {
   try {
     const storageKey = await getStorageKey(uid);
