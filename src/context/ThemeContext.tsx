@@ -11,8 +11,10 @@ type ThemeContextShape = {
 
 const ThemeContext = createContext<ThemeContextShape>(null!);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [scheme, setScheme] = useState<ColorSchemeName>(Appearance.getColorScheme());
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [scheme, setScheme] = useState<ColorSchemeName>("dark");
 
   useEffect(() => {
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
@@ -21,7 +23,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => subscription.remove();
   }, []);
 
-  const toggle = () => setScheme((prev) => (prev === "dark" ? "light" : "dark"));
+  const toggle = () =>
+    setScheme((prev) => (prev === "dark" ? "light" : "dark"));
 
   const colors = scheme === "dark" ? darkTheme : lightTheme;
 

@@ -20,7 +20,7 @@ import * as Haptics from "expo-haptics"
 import { LinearGradient } from "expo-linear-gradient"
 
 const screenWidth = Dimensions.get("window").width
-export const boxSize = (screenWidth - 48) / 2 // dışarıdan import edilebilir
+export const boxSize = (screenWidth - 48) / 2
 
 type Props = {
   uri: string
@@ -181,7 +181,7 @@ export default function StyleBox({ uri, value, onPress, size }: Props) {
             </RNAnimated.View>
           </Animated.View>
 
-          <View style={styles.labelContainer}>
+          {/* <View style={styles.labelContainer}>
             <Text
               style={[
                 styles.labelText,
@@ -194,7 +194,7 @@ export default function StyleBox({ uri, value, onPress, size }: Props) {
             >
               {value}
             </Text>
-          </View>
+          </View> */}
         </View>
       </TouchableOpacity>
     </Animated.View>
