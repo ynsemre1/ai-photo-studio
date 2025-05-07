@@ -35,7 +35,7 @@ export default function HomeScreen() {
   const [showAllStyles, setShowAllStyles] = useState(true);
   const [recentImages, setRecentImages] = useState<string[]>([]);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
-  const [visibleStyles, setVisibleStyles] = useState(10);
+  const [visibleStyles, setVisibleStyles] = useState(16);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -68,7 +68,7 @@ export default function HomeScreen() {
 
   const loadMoreStyles = () => {
     if (visibleStyles < allStyles.length) {
-      setVisibleStyles((prev) => prev + 10);
+      setVisibleStyles((prev) => prev + 16);
     }
   };
 

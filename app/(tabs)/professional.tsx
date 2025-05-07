@@ -15,11 +15,11 @@ export default function ProfessionalScreen() {
   const { colors, scheme } = useTheme()
   const professionalList = styleData?.professional || []
 
-  const [visibleCount, setVisibleCount] = useState(8)
+  const [visibleCount, setVisibleCount] = useState(16)
 
   const loadMore = () => {
     if (visibleCount < professionalList.length) {
-      setVisibleCount(prev => prev + 8)
+      setVisibleCount(prev => prev + 16)
     }
   }
 

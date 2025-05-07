@@ -15,11 +15,11 @@ export default function CarScreen() {
   const { colors, scheme } = useTheme()
   const carList = styleData?.car || []
 
-  const [visibleCount, setVisibleCount] = useState(8)
+  const [visibleCount, setVisibleCount] = useState(16)
 
   const loadMore = () => {
     if (visibleCount < carList.length) {
-      setVisibleCount(prev => prev + 8)
+      setVisibleCount(prev => prev + 16)
     }
   }
 

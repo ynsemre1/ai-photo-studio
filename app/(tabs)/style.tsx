@@ -18,13 +18,13 @@ export default function StyleScreen() {
   const { colors, scheme } = useTheme()
 
   const [selectedGender, setSelectedGender] = useState<"male" | "female">("male")
-  const [visibleCount, setVisibleCount] = useState(12)
+  const [visibleCount, setVisibleCount] = useState(16)
 
   const filteredList = (styleData?.style || []).filter((item) => item.gender === selectedGender)
 
   const loadMore = () => {
     if (visibleCount < filteredList.length) {
-      setVisibleCount(prev => prev + 12)
+      setVisibleCount(prev => prev + 16)
     }
   }
 
