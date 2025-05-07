@@ -4,7 +4,12 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db, storage, auth } from "../firebase/config";
 import { getDownloadURL, ref as storageRef } from "firebase/storage";
 
-type StyleItem = { file_name: string; value: string; uri: string };
+type StyleItem = {
+  value: string;
+  uri: string;
+  gender?: "male" | "female";
+};
+
 type StyleData = {
   style: StyleItem[];
   car: StyleItem[];
@@ -21,6 +26,17 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
     professional: [],
   });
 
+  // Load cached data on first mount
+  useEffect(() => {
+    const loadCache = async () => {
+      const cached = await AsyncStorage.getItem("styleData");
+      if (cached) {
+        setData(JSON.parse(cached));
+      }
+    };
+    loadCache();
+  }, []);
+
   useEffect(() => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
@@ -32,34 +48,58 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
       const refCol = collection(db, type);
 
       const unsubscribe = onSnapshot(refCol, async (snap) => {
-        console.log("🔥 Firestore değişikliği tespit edildi:", type);
+        console.log("🔥 Firestore update detected for:", type);
 
         const enrichedData = await Promise.all(
           snap.docs.map(async (doc) => {
             const docData = doc.data();
-            const path = `styles/${type}/${docData.file_name}`;
+            const fileName = docData.file_name;
 
+            if (!fileName || !docData.value) return null;
+
+            // Gender-aware image path handling
+            if (docData.gender === true) {
+              try {
+                const malePath = `styles/${type}/male/${fileName}`;
+                const femalePath = `styles/${type}/female/${fileName}`;
+
+                const [maleUri, femaleUri] = await Promise.all([
+                  getDownloadURL(storageRef(storage, malePath)),
+                  getDownloadURL(storageRef(storage, femalePath)),
+                ]);
+
+                return [
+                  { value: docData.value, uri: maleUri, gender: "male" },
+                  { value: docData.value, uri: femaleUri, gender: "female" },
+                ];
+              } catch (err) {
+                console.log("🚫 Gendered URI fetch failed:", fileName);
+                return null;
+              }
+            }
+
+            // Non-gendered classic fetch
             try {
+              const path = `styles/${type}/${fileName}`;
               const uri = await getDownloadURL(storageRef(storage, path));
-              return { ...docData, uri } as StyleItem;
+              return { value: docData.value, uri };
             } catch (err) {
-              console.log("🚫 URI alınamadı:", path);
-              console.log("Hata Detayı:", JSON.stringify(err));
+              console.log("🚫 URI fetch failed:", fileName);
               return null;
             }
           })
         );
 
-        const filtered = enrichedData.filter(Boolean) as StyleItem[];
+        const flattened = enrichedData.flat().filter(Boolean) as StyleItem[];
 
         setData((prev) => ({
           ...prev,
-          [type]: filtered,
+          [type]: flattened,
         }));
 
         const newCache = {
           ...data,
-          [type]: filtered,
+          [type]: flattened,
         };
 
         await AsyncStorage.setItem("styleData", JSON.stringify(newCache));
