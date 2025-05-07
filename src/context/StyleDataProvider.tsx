@@ -19,7 +19,11 @@ type StyleData = {
 const StyleContext = createContext<StyleData | null>(null);
 export const useStyleData = () => useContext(StyleContext);
 
-export const StyleDataProvider = ({ children }: { children: React.ReactNode }) => {
+export const StyleDataProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [data, setData] = useState<StyleData>({
     style: [],
     car: [],
@@ -54,11 +58,11 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
           snap.docs.map(async (doc) => {
             const docData = doc.data();
             const fileName = docData.file_name;
+            const isGendered = docData.gender === true;
 
             if (!fileName || !docData.value) return null;
 
-            // Gender-aware image path handling
-            if (docData.gender === true) {
+            if (isGendered) {
               try {
                 const malePath = `styles/${type}/male/${fileName}`;
                 const femalePath = `styles/${type}/female/${fileName}`;
@@ -78,7 +82,7 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
               }
             }
 
-            // Non-gendered classic fetch
+            // gender yoksa (veya false ise) klasik tek path
             try {
               const path = `styles/${type}/${fileName}`;
               const uri = await getDownloadURL(storageRef(storage, path));

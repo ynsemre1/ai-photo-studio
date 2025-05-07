@@ -12,11 +12,13 @@ export default function StyleScreen() {
   const styleData = useStyleData();
   const { colors } = useTheme();
 
-  const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
+  const [selectedGender, setSelectedGender] = useState<"male" | "female">(
+    "male"
+  );
 
-  // TODO: open styleList, when firebase gender add
-  // const styleList = (styleData?.style || []).filter(item => item.gender === selectedGender);
-  const styleList = styleData?.style || [];
+  const styleList = (styleData?.style || []).filter(
+    (item) => item.gender === selectedGender
+  );
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } });
@@ -33,13 +35,9 @@ export default function StyleScreen() {
       <FlatList
         data={styleList}
         renderItem={({ item, index }) => (
-          <StyleBox
-            uri={item.uri}
-            value={item.value}
-            onPress={handlePress}
-          />
+          <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
         )}
-        keyExtractor={(item, index) => `style-${index}`}
+        keyExtractor={(item) => item.uri}
         numColumns={2}
         contentContainerStyle={styles.gridContainer}
       />

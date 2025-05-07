@@ -69,7 +69,9 @@ export default function HomeScreen() {
         {recentImages.length > 0 && (
           <>
             <TouchableOpacity style={styles.sectionHeader}>
-              <Text style={[styles.header, { color: colors.text.primary }]}>Son Üretilenler</Text>
+              <Text style={[styles.header, { color: colors.text.primary }]}>
+                Son Üretilenler
+              </Text>
             </TouchableOpacity>
             <ScrollView
               horizontal
@@ -84,28 +86,30 @@ export default function HomeScreen() {
             </ScrollView>
           </>
         )}
-  
+
         {favoriteItems.length > 0 && (
           <>
             <TouchableOpacity
               style={styles.sectionHeader}
               onPress={() => setShowFavorites((prev) => !prev)}
             >
-              <Text style={[styles.header, { color: colors.text.primary }]}>Favoriler</Text>
+              <Text style={[styles.header, { color: colors.text.primary }]}>
+                Favoriler
+              </Text>
               <Ionicons
                 name={showFavorites ? "chevron-up" : "chevron-down"}
                 size={20}
                 color={colors.text.primary}
               />
             </TouchableOpacity>
-  
+
             {showFavorites ? (
               <View style={styles.horizontalList}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {favoriteItems.map((item) =>
                     item ? (
                       <StyleBox
-                        key={item.value}
+                        key={item.uri}
                         uri={item.uri}
                         value={item.value}
                         onPress={handlePress}
@@ -120,24 +124,26 @@ export default function HomeScreen() {
             )}
           </>
         )}
-  
+
         <TouchableOpacity
           style={styles.sectionHeader}
           onPress={() => setShowAllStyles((prev) => !prev)}
         >
-          <Text style={[styles.header, { color: colors.text.primary }]}>Tüm Stiller</Text>
+          <Text style={[styles.header, { color: colors.text.primary }]}>
+            Tüm Stiller
+          </Text>
           <Ionicons
             name={showAllStyles ? "chevron-up" : "chevron-down"}
             size={20}
             color={colors.text.primary}
           />
         </TouchableOpacity>
-  
+
         {showAllStyles ? (
           <View style={styles.gridContainer}>
             {allStyles.map((item) => (
               <StyleBox
-                key={item.value}
+                key={item.uri}
                 uri={item.uri}
                 value={item.value}
                 onPress={handlePress}
@@ -148,7 +154,7 @@ export default function HomeScreen() {
           <View style={{ height: 16 }} />
         )}
       </ScrollView>
-  
+
       {/* Modal en dışta */}
       <ImagePreviewModal
         visible={!!previewUri}
