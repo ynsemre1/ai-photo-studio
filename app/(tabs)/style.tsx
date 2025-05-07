@@ -18,8 +18,15 @@ export default function StyleScreen() {
   const { colors, scheme } = useTheme()
 
   const [selectedGender, setSelectedGender] = useState<"male" | "female">("male")
+  const [visibleCount, setVisibleCount] = useState(12)
 
-  const styleList = (styleData?.style || []).filter((item) => item.gender === selectedGender)
+  const filteredList = (styleData?.style || []).filter((item) => item.gender === selectedGender)
+
+  const loadMore = () => {
+    if (visibleCount < filteredList.length) {
+      setVisibleCount(prev => prev + 12)
+    }
+  }
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } })
@@ -52,15 +59,18 @@ export default function StyleScreen() {
             backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100],
             borderColor: scheme === "dark" ? colors.primary[800] : colors.primary[200],
           }]}>
-            <GenderSwitch selected={selectedGender} onChange={setSelectedGender} />
+            <GenderSwitch selected={selectedGender} onChange={gender => {
+              setSelectedGender(gender)
+              setVisibleCount(8) // reset visible on gender change
+            }} />
             <View style={{ width: 12 }} />
             <CoinBadge />
           </View>
         </Animated.View>
 
-        {styleList.length > 0 ? (
+        {filteredList.length > 0 ? (
           <FlatList
-            data={styleList}
+            data={filteredList.slice(0, visibleCount)}
             renderItem={({ item, index }) => (
               <Animated.View 
                 entering={FadeInDown.delay(150 + index * 50).duration(600)}
@@ -72,6 +82,8 @@ export default function StyleScreen() {
             numColumns={2}
             contentContainerStyle={styles.gridContainer}
             showsVerticalScrollIndicator={false}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
           />
         ) : (
           <View style={styles.emptyContainer}>
@@ -134,5 +146,5 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 16,
     fontSize: 18,
-  }
+  },
 })

@@ -7,12 +7,21 @@ import { useTheme } from "../../src/context/ThemeContext"
 import Animated, { FadeInDown, FadeIn } from "react-native-reanimated"
 import { LinearGradient } from "expo-linear-gradient"
 import { Feather } from "@expo/vector-icons"
+import { useState } from "react"
 
 export default function CarScreen() {
   const router = useRouter()
   const styleData = useStyleData()
   const { colors, scheme } = useTheme()
   const carList = styleData?.car || []
+
+  const [visibleCount, setVisibleCount] = useState(8)
+
+  const loadMore = () => {
+    if (visibleCount < carList.length) {
+      setVisibleCount(prev => prev + 8)
+    }
+  }
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } })
@@ -39,10 +48,10 @@ export default function CarScreen() {
 
         {carList.length > 0 ? (
           <FlatList
-            data={carList}
+            data={carList.slice(0, visibleCount)}
             renderItem={({ item, index }) =>
               item && item.uri && item.value ? (
-                <Animated.View 
+                <Animated.View
                   entering={FadeInDown.delay(100 + index * 50).duration(600)}
                 >
                   <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
@@ -51,6 +60,8 @@ export default function CarScreen() {
             }
             keyExtractor={(item, index) => `car-${index}`}
             numColumns={2}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
             contentContainerStyle={styles.gridContainer}
             showsVerticalScrollIndicator={false}
           />
@@ -68,8 +79,8 @@ export default function CarScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1 
+  container: {
+    flex: 1,
   },
   headerContainer: {
     paddingTop: 20,
@@ -102,5 +113,5 @@ const styles = StyleSheet.create({
   emptyText: {
     marginTop: 16,
     fontSize: 18,
-  }
+  },
 })

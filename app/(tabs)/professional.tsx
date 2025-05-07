@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react"
 import { View, FlatList, StyleSheet, Text } from "react-native"
 import { useRouter } from "expo-router"
 import { useStyleData } from "../../src/context/StyleDataProvider"
@@ -12,12 +13,19 @@ export default function ProfessionalScreen() {
   const router = useRouter()
   const styleData = useStyleData()
   const { colors, scheme } = useTheme()
+  const professionalList = styleData?.professional || []
+
+  const [visibleCount, setVisibleCount] = useState(8)
+
+  const loadMore = () => {
+    if (visibleCount < professionalList.length) {
+      setVisibleCount(prev => prev + 8)
+    }
+  }
 
   const handlePress = (value: string) => {
     router.push({ pathname: "/upload-image", params: { value } })
   }
-
-  const professionalList = styleData?.professional || []
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
@@ -40,7 +48,7 @@ export default function ProfessionalScreen() {
 
         {professionalList.length > 0 ? (
           <FlatList
-            data={professionalList}
+            data={professionalList.slice(0, visibleCount)}
             renderItem={({ item, index }) => (
               <Animated.View 
                 entering={FadeInDown.delay(100 + index * 50).duration(600)}
@@ -52,6 +60,8 @@ export default function ProfessionalScreen() {
             numColumns={2}
             contentContainerStyle={styles.gridContainer}
             showsVerticalScrollIndicator={false}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
           />
         ) : (
           <View style={styles.emptyContainer}>
@@ -67,9 +77,7 @@ export default function ProfessionalScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1 
-  },
+  container: { flex: 1 },
   headerContainer: {
     paddingTop: 20,
     paddingHorizontal: 16,
