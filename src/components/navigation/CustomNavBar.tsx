@@ -11,6 +11,7 @@ import Animated, {
   BounceOutDown,
 } from "react-native-reanimated";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { useUploadImage } from "../../context/UploadImageContext";
 
 const AnimatedTouchableOpacity =
   Animated.createAnimatedComponent(TouchableOpacity);
@@ -21,12 +22,15 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const { colors, scheme } = useTheme(); // colors'ı tema üzerinden alıyoruz
+  const { triggerCamera } = useUploadImage();
   const currentRouteName = state.routes[state.index].name;
   const isUploadImageScreen = currentRouteName === "upload-image";
 
   const renderTab = (route: any, index: number) => {
     if (
-      ["_sitemap", "+not-found", "upload-image", "index", "purchase"].includes(route.name)
+      ["_sitemap", "+not-found", "upload-image", "index", "purchase"].includes(
+        route.name
+      )
     )
       return null;
 
@@ -104,14 +108,16 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
           exiting={BounceOutDown.duration(400)}
           style={[styles.plusWrapper]}
         >
-          <View
+          <TouchableOpacity
             style={[
               styles.plusButton,
               { backgroundColor: colors.success.DEFAULT },
             ]}
+            onPress={triggerCamera}
+            activeOpacity={0.8}
           >
-            <Feather name="plus" size={32} color={colors.text.inverse} />
-          </View>
+            <Feather name="camera" size={24} color={colors.text.inverse} />
+          </TouchableOpacity>
         </Animated.View>
       )}
     </View>
@@ -156,14 +162,14 @@ const styles = StyleSheet.create({
   },
   plusWrapper: {
     position: "absolute",
-    top: -58,
+    top: -38,
     alignSelf: "center",
     zIndex: 10,
     alignItems: "center",
   },
   plusButton: {
-    width: 64,
-    height: 64,
+    width: 45,
+    height: 45,
     borderRadius: 32,
     justifyContent: "center",
     alignItems: "center",

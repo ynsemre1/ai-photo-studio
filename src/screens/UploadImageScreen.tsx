@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import { getAuth } from "firebase/auth";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../src/context/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
+import { useUploadImage } from "../context/UploadImageContext";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -28,6 +29,7 @@ export default function UploadImageScreen() {
   const [generatedUri, setGeneratedUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { colors, scheme } = useTheme();
+  const { setTriggerCamera } = useUploadImage();
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -74,6 +76,33 @@ export default function UploadImageScreen() {
 
   const handleResetGenerated = () => {
     setGeneratedUri(null);
+  };
+
+  useEffect(() => {
+    setTriggerCamera(() => pickFromCamera);
+  }, []);
+  
+  const pickFromCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+  
+      if (!result.canceled && result.assets.length > 0) {
+        const cropped = await ImageManipulator.manipulateAsync(
+          result.assets[0].uri,
+          [{ resize: { width: 1024, height: 1024 } }],
+          { compress: 1, format: ImageManipulator.SaveFormat.PNG }
+        );
+  
+        setOriginalUri(cropped.uri);
+        setGeneratedUri(null);
+      }
+    } catch (e) {
+      console.log("CAMERA ERROR:", e);
+    }
   };
 
   return (
