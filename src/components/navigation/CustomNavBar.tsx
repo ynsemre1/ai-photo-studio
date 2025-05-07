@@ -78,7 +78,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
             exiting={FadeOut.duration(200)}
             style={{
               color: isFocused ? colors.text.inverse : colors.text.primary, // Text color change based on focus
-              fontSize: 14,
+              fontSize: 12,
               paddingLeft: 4,
               textAlign: "center",
             }}
@@ -127,17 +127,17 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
 function getIconByRouteName(routeName: string, color: string) {
   switch (routeName) {
     case "home":
-      return <Feather name="home" size={25} color={color} />;
+      return <Feather name="home" size={20} color={color} />;
     case "style":
-      return <Ionicons name="color-palette-outline" size={25} color={color} />;
+      return <Ionicons name="color-palette-outline" size={20} color={color} />;
     case "car":
-      return <Ionicons name="car-sport-outline" size={25} color={color} />;
+      return <Ionicons name="car-sport-outline" size={20} color={color} />;
     case "professional":
-      return <Ionicons name="airplane-outline" size={25} color={color} />;
+      return <Ionicons name="airplane-outline" size={20} color={color} />;
     case "profileScreens":
-      return <Feather name="user" size={25} color={color} />;
+      return <Feather name="user" size={20} color={color} />;
     default:
-      return <Feather name="circle" size={25} color={color} />;
+      return <Feather name="circle" size={20} color={color} />;
   }
 }
 
@@ -149,10 +149,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "80%",
     alignSelf: "center",
-    bottom: 40,
+    bottom: 10,
     borderRadius: 40,
     paddingHorizontal: 12,
-    paddingVertical: 15,
+    paddingVertical: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 5 },
     shadowRadius: 8,
