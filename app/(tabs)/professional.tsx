@@ -1,46 +1,105 @@
-import React from "react";
-import { View, FlatList, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
-import { useStyleData } from "../../src/context/StyleDataProvider";
-import StyleBox from "../../src/components/StyleBox";
-import { useTheme } from "../../src/context/ThemeContext";
+"use client"
+import { View, FlatList, StyleSheet, Text } from "react-native"
+import { useRouter } from "expo-router"
+import { useStyleData } from "../../src/context/StyleDataProvider"
+import StyleBox from "../../src/components/StyleBox"
+import { useTheme } from "../../src/context/ThemeContext"
+import Animated, { FadeInDown, FadeIn } from "react-native-reanimated"
+import { LinearGradient } from "expo-linear-gradient"
+import { Feather } from "@expo/vector-icons"
 
 export default function ProfessionalScreen() {
-  const router = useRouter();
-  const styleData = useStyleData();
-  const { colors } = useTheme();
+  const router = useRouter()
+  const styleData = useStyleData()
+  const { colors, scheme } = useTheme()
 
   const handlePress = (value: string) => {
-    router.push({ pathname: "/upload-image", params: { value } });
-  };
+    router.push({ pathname: "/upload-image", params: { value } })
+  }
 
-  const professionalList = styleData?.professional || [];
+  const professionalList = styleData?.professional || []
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
-      <FlatList
-        data={professionalList}
-        renderItem={({ item, index }) => (
-          <StyleBox
-            uri={item.uri}
-            value={item.value}
-            onPress={handlePress}
+      <LinearGradient
+        colors={
+          scheme === "dark"
+            ? [colors.bg.DEFAULT, colors.primary[900]]
+            : [colors.bg.DEFAULT, colors.primary[50]]
+        }
+        style={{ flex: 1 }}
+      >
+        <Animated.View entering={FadeIn.duration(600)} style={styles.headerContainer}>
+          <Text style={[styles.headerText, { color: colors.text.primary }]}>
+            Professional Styles
+          </Text>
+          <Text style={[styles.headerSubtext, { color: colors.text.secondary }]}>
+            Transform your photos with professional looks
+          </Text>
+        </Animated.View>
+
+        {professionalList.length > 0 ? (
+          <FlatList
+            data={professionalList}
+            renderItem={({ item, index }) => (
+              <Animated.View 
+                entering={FadeInDown.delay(100 + index * 50).duration(600)}
+              >
+                <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+              </Animated.View>
+            )}
+            keyExtractor={(item, index) => `pro-${index}`}
+            numColumns={2}
+            contentContainerStyle={styles.gridContainer}
+            showsVerticalScrollIndicator={false}
           />
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Feather name="image" size={60} color={colors.text.secondary} />
+            <Text style={[styles.emptyText, { color: colors.text.secondary }]}>
+              No professional styles available
+            </Text>
+          </View>
         )}
-        keyExtractor={(item, index) => `pro-${index}`}
-        numColumns={2}
-        contentContainerStyle={styles.gridContainer}
-      />
+      </LinearGradient>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { 
+    flex: 1 
+  },
+  headerContainer: {
+    paddingTop: 20,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+  },
+  headerText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  headerSubtext: {
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 4,
+  },
   gridContainer: {
     paddingVertical: 16,
     paddingHorizontal: 8,
     justifyContent: "center",
     alignItems: "center",
+    paddingBottom: 100,
   },
-});
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 100,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 18,
+  }
+})

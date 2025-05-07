@@ -30,9 +30,11 @@ export interface ColorPalette {
   primary: ColorScale
   error: { DEFAULT: string }
   success: { DEFAULT: string }
+  warning: { DEFAULT: string }
+  info: { DEFAULT: string }
   bg: { DEFAULT: string }
-  surface: { 100: string }
-  text: { primary: string; secondary: string; inverse: string }
+  surface: { 100: string; 200: string }
+  text: { primary: string; secondary: string; inverse: string; accent: string }
 }
 
 const primaryScale: ColorScale = {
@@ -54,12 +56,18 @@ export const lightTheme: ColorPalette = {
   primary: primaryScale,
   error: { DEFAULT: "#EF4444" }, // Brighter red for errors
   success: { DEFAULT: "#10B981" }, // Emerald green for success
+  warning: { DEFAULT: "#F59E0B" }, // Amber for warnings
+  info: { DEFAULT: "#3B82F6" }, // Blue for information
   bg: { DEFAULT: "#F8FAFC" }, // Lighter background
-  surface: { 100: "#FFFFFF" }, // Pure white surface
+  surface: {
+    100: "#FFFFFF", // Pure white surface
+    200: "#F1F5F9", // Light gray surface
+  },
   text: {
     primary: "#1E293B", // Slate-800 for better readability
     secondary: "#64748B", // Slate-500 for secondary text
     inverse: "#FFFFFF", // White for text on dark backgrounds
+    accent: "#4F46E5", // Primary color for accented text
   },
 }
 
@@ -77,12 +85,18 @@ export const darkTheme: ColorPalette = {
   primary: primaryDark,
   error: { DEFAULT: "#FF6B6F" },
   success: { DEFAULT: "#00E08A" },
+  warning: { DEFAULT: "#FBBF24" }, // Amber for warnings
+  info: { DEFAULT: "#60A5FA" }, // Blue for information
   bg: { DEFAULT: "#0A0A12" },
-  surface: { 100: "#18181F" },
+  surface: {
+    100: "#18181F",
+    200: "#1E1E2A",
+  },
   text: {
     primary: "#E2E8F0",
     secondary: "#94A3B8",
     inverse: "#0A0A12",
+    accent: "#7FE0FB",
   },
 }
 
