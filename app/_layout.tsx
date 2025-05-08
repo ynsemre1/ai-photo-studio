@@ -6,13 +6,16 @@ import { ThemeProvider, useTheme } from "../src/context/ThemeContext";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import SplashScreen from "../src/components/SplashScreen";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const [hasRedirected, setHasRedirected] = useState(false);
 
+  // Firebase auth kontrolü
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -21,38 +24,37 @@ export default function RootLayout() {
     return unsub;
   }, []);
 
-  const [hasRedirected, setHasRedirected] = useState(false);
+  // Sayfa yönlendirme kontrolü
+  useEffect(() => {
+    if (!ready) return;
 
-useEffect(() => {
-  if (!ready) return;
-  
-  const isAuthPage =
-    pathname === "/welcome" || pathname === "/login" || pathname === "/register";
+    const isAuthPage =
+      pathname === "/welcome" || pathname === "/login" || pathname === "/register";
 
-  const isProtectedRoute =
-    pathname === "/" ||
-    pathname === "/car" ||
-    pathname === "/style" ||
-    pathname === "/professional" ||
-    pathname === "/profile";
+    const isProtectedRoute =
+      pathname === "/" ||
+      pathname === "/car" ||
+      pathname === "/style" ||
+      pathname === "/professional" ||
+      pathname === "/profile";
 
-  if (user) {
-    if (!user.emailVerified && pathname !== "/(auth)/login" && !hasRedirected) {
-      setHasRedirected(true);
-      router.replace("/(auth)/login");
-    } else if (user.emailVerified && isAuthPage && !hasRedirected) {
-      setHasRedirected(true);
-      router.replace("/");
+    if (user) {
+      if (!user.emailVerified && pathname !== "/(auth)/login" && !hasRedirected) {
+        setHasRedirected(true);
+        router.replace("/(auth)/login");
+      } else if (user.emailVerified && isAuthPage && !hasRedirected) {
+        setHasRedirected(true);
+        router.replace("/");
+      }
+    } else {
+      if (isProtectedRoute && !hasRedirected) {
+        setHasRedirected(true);
+        router.replace("/(auth)/welcome");
+      }
     }
-  } else {
-    if (isProtectedRoute && !hasRedirected) {
-      setHasRedirected(true);
-      router.replace("/(auth)/welcome");
-    }
-  }
-}, [ready, user, pathname]);
+  }, [ready, user, pathname]);
 
-  if (!ready) return null;
+  if (!ready) return <SplashScreen />;
 
   return (
     <ThemeProvider>

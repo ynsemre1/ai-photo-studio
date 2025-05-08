@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,8 +18,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
 import ImagePreviewModal from "../../src/components/ImagePreviewModal";
 import { useTheme } from "../../src/context/ThemeContext";
-import Animated, { FadeInDown, FadeIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { useMemo } from "react";
 
 const { width } = Dimensions.get("window");
 
@@ -36,6 +34,11 @@ export default function HomeScreen() {
   const [recentImages, setRecentImages] = useState<string[]>([]);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const [visibleStyles, setVisibleStyles] = useState(16);
+  const [hasAnimated, setHasAnimated] = useState(false); // 🧠 Animasyonun sadece 1 kez çalışmasını kontrol eder
+
+  useEffect(() => {
+    setHasAnimated(true);
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -72,34 +75,34 @@ export default function HomeScreen() {
     }
   };
 
-  const renderHeader = () => (
-    <>
-      <Animated.View entering={FadeIn.duration(600)} style={styles.headerContainer}>
-        <Text style={[styles.welcomeText, { color: colors.text.primary }]}>
-          AI Photo Studio
-        </Text>
-        <Text style={[styles.welcomeSubtext, { color: colors.text.secondary }]}>
-          Transform your photos with AI
-        </Text>
-      </Animated.View>
+  const headerComponent = useMemo(
+    () => (
+      <>
+        <View style={styles.headerContainer}>
+          <Text style={[styles.welcomeText, { color: colors.text.primary }]}>
+            AI Photo Studio
+          </Text>
+          <Text
+            style={[styles.welcomeSubtext, { color: colors.text.secondary }]}
+          >
+            Transform your photos with AI
+          </Text>
+        </View>
 
-      {recentImages.length > 0 && (
-        <Animated.View entering={FadeInDown.delay(100).duration(600)}>
-          <TouchableOpacity style={styles.sectionHeader}>
-            <Text style={[styles.header, { color: colors.text.primary }]}>
-              Recent Creations
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.horizontalList}>
-            <FlatList
-              data={recentImages}
-              keyExtractor={(item) => item}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item, index }) => (
-                <Animated.View
-                  entering={FadeInDown.delay(150 + index * 50).duration(600)}
-                >
+        {recentImages.length > 0 && (
+          <View>
+            <TouchableOpacity style={styles.sectionHeader}>
+              <Text style={[styles.header, { color: colors.text.primary }]}>
+                Recent Creations
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.horizontalList}>
+              <FlatList
+                data={recentImages}
+                keyExtractor={(item) => item}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => setPreviewUri(item)}>
                     <Image
                       source={{ uri: item }}
@@ -115,15 +118,13 @@ export default function HomeScreen() {
                       ]}
                     />
                   </TouchableOpacity>
-                </Animated.View>
-              )}
-            />
+                )}
+              />
+            </View>
           </View>
-        </Animated.View>
-      )}
+        )}
 
-      {favoriteItems.length > 0 && (
-        <Animated.View entering={FadeInDown.delay(200).duration(600)}>
+        <View>
           <TouchableOpacity
             style={styles.sectionHeader}
             onPress={() => setShowFavorites((prev) => !prev)}
@@ -131,15 +132,17 @@ export default function HomeScreen() {
             <Text style={[styles.header, { color: colors.text.primary }]}>
               Favorites
             </Text>
-            <View style={[
-              styles.iconContainer,
-              {
-                backgroundColor:
-                  scheme === "dark"
-                    ? colors.primary[800]
-                    : colors.primary[100],
-              }
-            ]}>
+            <View
+              style={[
+                styles.iconContainer,
+                {
+                  backgroundColor:
+                    scheme === "dark"
+                      ? colors.primary[800]
+                      : colors.primary[100],
+                },
+              ]}
+            >
               <Ionicons
                 name={showFavorites ? "chevron-up" : "chevron-down"}
                 size={20}
@@ -148,57 +151,51 @@ export default function HomeScreen() {
             </View>
           </TouchableOpacity>
 
-          {showFavorites && (
-            <View style={styles.horizontalList}>
-              <FlatList
-                data={favoriteItems}
-                keyExtractor={(item) => item!.uri}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={({ item, index }) =>
-                  item ? (
-                    <Animated.View
-                      entering={FadeInDown.delay(250 + index * 50).duration(600)}
-                    >
-                      <StyleBox
-                        uri={item.uri}
-                        value={item.value}
-                        onPress={handlePress}
-                        size={boxSize}
-                      />
-                    </Animated.View>
-                  ) : null
-                }
-              />
-            </View>
-          )}
-        </Animated.View>
-      )}
-
-      <TouchableOpacity
-        style={styles.sectionHeader}
-        onPress={() => setShowAllStyles((prev) => !prev)}
-      >
-        <Text style={[styles.header, { color: colors.text.primary }]}>
-          All Styles
-        </Text>
-        <View style={[
-          styles.iconContainer,
-          {
-            backgroundColor:
-              scheme === "dark"
-                ? colors.primary[800]
-                : colors.primary[100],
-          }
-        ]}>
-          <Ionicons
-            name={showAllStyles ? "chevron-up" : "chevron-down"}
-            size={20}
-            color={colors.primary.DEFAULT}
+          <FlatList
+            data={showFavorites ? favoriteItems : []}
+            keyExtractor={(item) => item!.uri}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+            renderItem={({ item }) =>
+              item ? (
+                <StyleBox
+                  uri={item.uri}
+                  value={item.value}
+                  onPress={handlePress}
+                  size={boxSize}
+                />
+              ) : null
+            }
           />
         </View>
-      </TouchableOpacity>
-    </>
+
+        <TouchableOpacity
+          style={styles.sectionHeader}
+          onPress={() => setShowAllStyles((prev) => !prev)}
+        >
+          <Text style={[styles.header, { color: colors.text.primary }]}>
+            All Styles
+          </Text>
+          <View
+            style={[
+              styles.iconContainer,
+              {
+                backgroundColor:
+                  scheme === "dark" ? colors.primary[800] : colors.primary[100],
+              },
+            ]}
+          >
+            <Ionicons
+              name={showAllStyles ? "chevron-up" : "chevron-down"}
+              size={20}
+              color={colors.primary.DEFAULT}
+            />
+          </View>
+        </TouchableOpacity>
+      </>
+    ),
+    [recentImages, scheme, colors, favoriteItems, showFavorites, showAllStyles]
   );
 
   return (
@@ -211,31 +208,20 @@ export default function HomeScreen() {
         }
         style={{ flex: 1 }}
       >
-        {showAllStyles && (
-          <FlatList
-            data={allStyles.slice(0, visibleStyles)}
-            numColumns={2}
-            keyExtractor={(item) => item.uri}
-            contentContainerStyle={styles.gridContainer}
-            columnWrapperStyle={{ justifyContent: "center" }}
-            onEndReached={loadMoreStyles}
-            onEndReachedThreshold={0.5}
-            ListHeaderComponent={renderHeader}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <Animated.View
-                entering={FadeInDown.delay(350 + index * 20).duration(600)}
-              >
-                <StyleBox
-                  uri={item.uri}
-                  value={item.value}
-                  onPress={handlePress}
-                />
-              </Animated.View>
-            )}
-          />
-        )}
-
+        <FlatList
+          data={showAllStyles ? allStyles.slice(0, visibleStyles) : []}
+          numColumns={2}
+          keyExtractor={(item) => item.uri}
+          contentContainerStyle={styles.gridContainer}
+          columnWrapperStyle={{ justifyContent: "center" }}
+          onEndReached={loadMoreStyles}
+          onEndReachedThreshold={0.5}
+          ListHeaderComponent={headerComponent}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+          )}
+        />
         <ImagePreviewModal
           visible={!!previewUri}
           uri={previewUri!}

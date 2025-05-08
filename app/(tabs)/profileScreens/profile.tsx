@@ -1,83 +1,83 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  FlatList, 
-  Image, 
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
+  Image,
   Dimensions,
-  RefreshControl
-} from "react-native"
-import { getAuth } from "firebase/auth"
-import { Ionicons, Feather } from "@expo/vector-icons"
-import { useFavorites } from "../../../src/context/FavoriteContext"
-import { useRouter } from "expo-router"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { useTheme } from "../../../src/context/ThemeContext"
-import ImagePreviewModal from "../../../src/components/ImagePreviewModal"
-import { getRecentGeneratedImages } from "../../../src/utils/saveGeneratedImage"
-import { useCoin } from "../../../src/context/CoinContext"
-import { useUser } from "../../../src/context/UserContext"
-import Animated, { FadeInDown, FadeIn, SlideInRight } from "react-native-reanimated"
-import { LinearGradient } from "expo-linear-gradient"
+  RefreshControl,
+} from "react-native";
+import { getAuth } from "firebase/auth";
+import { Ionicons, Feather } from "@expo/vector-icons";
+import { useFavorites } from "../../../src/context/FavoriteContext";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "../../../src/context/ThemeContext";
+import ImagePreviewModal from "../../../src/components/ImagePreviewModal";
+import { getRecentGeneratedImages } from "../../../src/utils/saveGeneratedImage";
+import { useCoin } from "../../../src/context/CoinContext";
+import { useUser } from "../../../src/context/UserContext";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeIn } from "react-native-reanimated";
 
-const screenWidth = Dimensions.get("window").width
+const screenWidth = Dimensions.get("window").width;
 
 export default function ProfileScreen() {
-  const auth = getAuth()
-  const user = auth.currentUser
-  const { colors, scheme } = useTheme()
-  const [images, setImages] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
-  const [refreshing, setRefreshing] = useState(false)
-  const [previewUri, setPreviewUri] = useState<string | null>(null)
-  const { favorites } = useFavorites()
-  const { coin } = useCoin()
-  const { userData, loading: userLoading } = useUser()
-  const router = useRouter()
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const { colors, scheme } = useTheme();
+  const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [previewUri, setPreviewUri] = useState<string | null>(null);
+  const { favorites } = useFavorites();
+  const { coin } = useCoin();
+  const { userData, loading: userLoading } = useUser();
+  const router = useRouter();
 
   const fetchImages = async () => {
-    if (!user) return
-    
+    if (!user) return;
+
     try {
-      setLoading(true)
-      const localUris = await getRecentGeneratedImages(user.uid)
-      setImages(localUris.reverse())
+      setLoading(true);
+      const localUris = await getRecentGeneratedImages(user.uid);
+      setImages(localUris.reverse());
     } catch (err) {
-      console.log("[ERROR - fetchImages]:", err)
+      console.log("[ERROR - fetchImages]:", err);
     } finally {
-      setLoading(false)
-      setRefreshing(false)
+      setLoading(false);
+      setRefreshing(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchImages()
-  }, [user])
+    fetchImages();
+  }, [user]);
 
   const handleRefresh = () => {
-    setRefreshing(true)
-    fetchImages()
-  }
+    setRefreshing(true);
+    fetchImages();
+  };
 
   const handleGoSettings = () => {
-    router.push("/profileScreens/settings")
-  }
+    router.push("/profileScreens/settings");
+  };
 
   if (!user || loading || userLoading) {
     return (
       <View style={[styles.centered, { backgroundColor: colors.bg.DEFAULT }]}>
         <ActivityIndicator size="large" color={colors.primary.DEFAULT} />
       </View>
-    )
+    );
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: colors.bg.DEFAULT }]}
+    >
       <LinearGradient
         colors={
           scheme === "dark"
@@ -86,91 +86,149 @@ export default function ProfileScreen() {
         }
         style={{ flex: 1 }}
       >
-        <Animated.View 
-          entering={FadeIn.duration(600)}
-          style={[styles.headerContainer]}
+        {/* Hafif giriş animasyonu sadece header'a */}
+        <Animated.View
+          entering={FadeIn.duration(250)}
+          style={styles.headerContainer}
         >
           <View style={styles.headerTop}>
             <View style={styles.userInfoContainer}>
-              <Animated.View 
-                entering={SlideInRight.delay(200).duration(600)}
-                style={[styles.avatarContainer, { 
-                  backgroundColor: scheme === "dark" ? colors.primary[800] : colors.primary[100],
-                  borderColor: colors.primary.DEFAULT,
-                }]}
+              <View
+                style={[
+                  styles.avatarContainer,
+                  {
+                    backgroundColor:
+                      scheme === "dark"
+                        ? colors.primary[800]
+                        : colors.primary[100],
+                    borderColor: colors.primary.DEFAULT,
+                  },
+                ]}
               >
                 <Feather name="user" size={30} color={colors.primary.DEFAULT} />
-              </Animated.View>
+              </View>
               <View style={styles.userTextContainer}>
-                <Animated.Text 
-                  entering={FadeInDown.delay(300).duration(600)}
-                  style={[styles.username, { color: colors.text.primary }]}
-                >
-                  {userData?.name && userData?.surname ? `${userData.name} ${userData.surname}` : "Your Name"}
-                </Animated.Text>
-                <Animated.Text 
-                  entering={FadeInDown.delay(400).duration(600)}
-                  style={[styles.email, { color: colors.text.secondary }]}
-                >
+                <Text style={[styles.username, { color: colors.text.primary }]}>
+                  {userData?.name && userData?.surname
+                    ? `${userData.name} ${userData.surname}`
+                    : "Your Name"}
+                </Text>
+                <Text style={[styles.email, { color: colors.text.secondary }]}>
                   {userData?.email}
-                </Animated.Text>
+                </Text>
               </View>
             </View>
-            <TouchableOpacity 
-              style={[styles.settingsButton, { 
-                backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100],
-              }]} 
+            <TouchableOpacity
+              style={[
+                styles.settingsButton,
+                {
+                  backgroundColor:
+                    scheme === "dark"
+                      ? colors.surface[100]
+                      : colors.primary[100],
+                },
+              ]}
               onPress={handleGoSettings}
             >
-              <Ionicons name="settings-outline" size={24} color={colors.text.primary} />
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={colors.text.primary}
+              />
             </TouchableOpacity>
           </View>
 
-          <Animated.View
-            entering={FadeInDown.delay(100).duration(600)}
+          <View
             style={[
               styles.statsCard,
               {
-                backgroundColor: scheme === "dark" ? colors.surface[100] : colors.bg.DEFAULT,
-                borderColor: scheme === "dark" ? colors.primary[800] : colors.primary[200],
+                backgroundColor:
+                  scheme === "dark" ? colors.surface[100] : colors.bg.DEFAULT,
+                borderColor:
+                  scheme === "dark" ? colors.primary[800] : colors.primary[200],
               },
             ]}
           >
             <View style={styles.statBox}>
-              <View style={[styles.statIconContainer, { backgroundColor: colors.primary.DEFAULT }]}>
-                <Ionicons name="wallet-outline" size={20} color={colors.text.inverse} />
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: colors.primary.DEFAULT },
+                ]}
+              >
+                <Ionicons
+                  name="wallet-outline"
+                  size={20}
+                  color={colors.text.inverse}
+                />
               </View>
-              <Text style={[styles.statValue, { color: colors.text.primary }]}>{coin}</Text>
-              <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Coins</Text>
+              <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                {coin}
+              </Text>
+              <Text
+                style={[styles.statLabel, { color: colors.text.secondary }]}
+              >
+                Coins
+              </Text>
             </View>
             <View style={styles.statBox}>
-              <View style={[styles.statIconContainer, { backgroundColor: colors.primary.DEFAULT }]}>
-                <Ionicons name="star-outline" size={20} color={colors.text.inverse} />
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: colors.primary.DEFAULT },
+                ]}
+              >
+                <Ionicons
+                  name="star-outline"
+                  size={20}
+                  color={colors.text.inverse}
+                />
               </View>
-              <Text style={[styles.statValue, { color: colors.text.primary }]}>{favorites.length}</Text>
-              <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Favorites</Text>
+              <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                {favorites.length}
+              </Text>
+              <Text
+                style={[styles.statLabel, { color: colors.text.secondary }]}
+              >
+                Favorites
+              </Text>
             </View>
             <View style={styles.statBox}>
-              <View style={[styles.statIconContainer, { backgroundColor: colors.primary.DEFAULT }]}>
-                <Ionicons name="images-outline" size={20} color={colors.text.inverse} />
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: colors.primary.DEFAULT },
+                ]}
+              >
+                <Ionicons
+                  name="images-outline"
+                  size={20}
+                  color={colors.text.inverse}
+                />
               </View>
-              <Text style={[styles.statValue, { color: colors.text.primary }]}>{images?.length || 0}</Text>
-              <Text style={[styles.statLabel, { color: colors.text.secondary }]}>Creations</Text>
+              <Text style={[styles.statValue, { color: colors.text.primary }]}>
+                {images?.length || 0}
+              </Text>
+              <Text
+                style={[styles.statLabel, { color: colors.text.secondary }]}
+              >
+                Creations
+              </Text>
             </View>
-          </Animated.View>
+          </View>
         </Animated.View>
 
-        <Animated.View 
-          entering={FadeInDown.delay(200).duration(600)}
-          style={styles.galleryHeaderContainer}
-        >
+        {/* Statik bölüm – animasyonsuz */}
+        <View style={styles.galleryHeaderContainer}>
           <Text style={[styles.galleryTitle, { color: colors.text.primary }]}>
             Your Gallery
           </Text>
-          <Text style={[styles.gallerySubtitle, { color: colors.text.secondary }]}>
+          <Text
+            style={[styles.gallerySubtitle, { color: colors.text.secondary }]}
+          >
             {images.length} images created
           </Text>
-        </Animated.View>
+        </View>
 
         {images.length > 0 ? (
           <FlatList
@@ -178,32 +236,42 @@ export default function ProfileScreen() {
             data={images}
             keyExtractor={(item, index) => index.toString()}
             numColumns={3}
-            renderItem={({ item, index }) => (
-              <Animated.View 
-                entering={FadeInDown.delay(300 + index * 30).duration(600)}
+            initialNumToRender={4}
+            maxToRenderPerBatch={9}
+            windowSize={5}
+            removeClippedSubviews={true}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => setPreviewUri(item)}
+                style={styles.imageTouchable}
+                activeOpacity={0.7}
               >
-                <TouchableOpacity 
-                  onPress={() => setPreviewUri(item)}
-                  style={styles.imageTouchable}
-                  activeOpacity={0.7}
-                >
-                  <Image 
-                    source={{ uri: item }} 
-                    style={[styles.imageItem, {
-                      borderColor: scheme === "dark" ? colors.primary[800] : colors.primary[200],
-                    }]} 
-                  />
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.7)']}
-                    style={styles.imageGradient}
-                  />
-                  <View style={styles.imageOverlay}>
-                    <Feather name="eye" size={16} color="#fff" />
-                  </View>
-                </TouchableOpacity>
-              </Animated.View>
+                <Image
+                  source={{ uri: item }}
+                  style={[
+                    styles.imageItem,
+                    {
+                      borderColor:
+                        scheme === "dark"
+                          ? colors.primary[800]
+                          : colors.primary[200],
+                    },
+                  ]}
+                  resizeMode="cover"
+                />
+                <LinearGradient
+                  colors={["transparent", "rgba(0,0,0,0.7)"]}
+                  style={styles.imageGradient}
+                />
+                <View style={styles.imageOverlay}>
+                  <Feather name="eye" size={16} color="#fff" />
+                </View>
+              </TouchableOpacity>
             )}
-            contentContainerStyle={[styles.gridContainer, { backgroundColor: 'transparent' }]}
+            contentContainerStyle={[
+              styles.gridContainer,
+              { backgroundColor: "transparent" },
+            ]}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -220,21 +288,33 @@ export default function ProfileScreen() {
             <Text style={[styles.emptyText, { color: colors.text.secondary }]}>
               No images created yet
             </Text>
-            <TouchableOpacity 
-              style={[styles.createButton, { backgroundColor: colors.primary.DEFAULT }]}
+            <TouchableOpacity
+              style={[
+                styles.createButton,
+                { backgroundColor: colors.primary.DEFAULT },
+              ]}
               onPress={() => router.push("/")}
             >
-              <Text style={[styles.createButtonText, { color: colors.text.inverse }]}>
+              <Text
+                style={[
+                  styles.createButtonText,
+                  { color: colors.text.inverse },
+                ]}
+              >
                 Create Your First Image
               </Text>
             </TouchableOpacity>
           </View>
         )}
 
-        <ImagePreviewModal visible={!!previewUri} uri={previewUri!} onClose={() => setPreviewUri(null)} />
+        <ImagePreviewModal
+          visible={!!previewUri}
+          uri={previewUri!}
+          onClose={() => setPreviewUri(null)}
+        />
       </LinearGradient>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -356,7 +436,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   imageGradient: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
@@ -364,15 +444,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   imageOverlay: {
-    position: 'absolute',
+    position: "absolute",
     right: 8,
     bottom: 8,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     width: 24,
     height: 24,
     borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   emptyContainer: {
     flex: 1,
@@ -399,4 +479,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-})
+});

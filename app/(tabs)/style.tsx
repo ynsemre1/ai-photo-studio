@@ -1,36 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { View, FlatList, StyleSheet, Text } from "react-native"
-import { useRouter } from "expo-router"
-import { useStyleData } from "../../src/context/StyleDataProvider"
-import StyleBox from "../../src/components/StyleBox"
-import { useTheme } from "../../src/context/ThemeContext"
-import GenderSwitch from "../../src/components/GenderSwitch"
-import CoinBadge from "../../src/components/CoinBadge"
-import Animated, { FadeInDown, FadeIn } from "react-native-reanimated"
-import { LinearGradient } from "expo-linear-gradient"
-import { Feather } from "@expo/vector-icons"
+import { useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useStyleData } from "../../src/context/StyleDataProvider";
+import StyleBox from "../../src/components/StyleBox";
+import { useTheme } from "../../src/context/ThemeContext";
+import GenderSwitch from "../../src/components/GenderSwitch";
+import CoinBadge from "../../src/components/CoinBadge";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import { Feather } from "@expo/vector-icons";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function StyleScreen() {
-  const router = useRouter()
-  const styleData = useStyleData()
-  const { colors, scheme } = useTheme()
+  const router = useRouter();
+  const styleData = useStyleData();
+  const { colors, scheme } = useTheme();
 
-  const [selectedGender, setSelectedGender] = useState<"male" | "female">("male")
-  const [visibleCount, setVisibleCount] = useState(16)
+  const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
+  const [visibleCount, setVisibleCount] = useState(16);
 
-  const filteredList = (styleData?.style || []).filter((item) => item.gender === selectedGender)
+  const filteredList =
+    (styleData?.style || []).filter((item) => item.gender === selectedGender) || [];
 
   const loadMore = () => {
     if (visibleCount < filteredList.length) {
-      setVisibleCount(prev => prev + 16)
+      setVisibleCount((prev) => prev + 16);
     }
-  }
+  };
 
   const handlePress = (value: string) => {
-    router.push({ pathname: "/upload-image", params: { value } })
-  }
+    router.push({ pathname: "/upload-image", params: { value } });
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
@@ -42,7 +52,8 @@ export default function StyleScreen() {
         }
         style={{ flex: 1 }}
       >
-        <Animated.View entering={FadeIn.duration(600)} style={styles.headerContainer}>
+        {/* Header with soft fade */}
+        <Animated.View entering={FadeIn.duration(250)} style={styles.headerContainer}>
           <Text style={[styles.headerText, { color: colors.text.primary }]}>
             Style Gallery
           </Text>
@@ -51,18 +62,24 @@ export default function StyleScreen() {
           </Text>
         </Animated.View>
 
-        <Animated.View 
-          entering={FadeInDown.delay(100).duration(600)}
-          style={styles.controlsContainer}
-        >
-          <View style={[styles.controlsWrapper, { 
-            backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100],
-            borderColor: scheme === "dark" ? colors.primary[800] : colors.primary[200],
-          }]}>
-            <GenderSwitch selected={selectedGender} onChange={gender => {
-              setSelectedGender(gender)
-              setVisibleCount(8) // reset visible on gender change
-            }} />
+        {/* Controls section with fade */}
+        <Animated.View entering={FadeIn.duration(250)} style={styles.controlsContainer}>
+          <View
+            style={[
+              styles.controlsWrapper,
+              {
+                backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100],
+                borderColor: scheme === "dark" ? colors.primary[800] : colors.primary[200],
+              },
+            ]}
+          >
+            <GenderSwitch
+              selected={selectedGender}
+              onChange={(gender) => {
+                setSelectedGender(gender);
+                setVisibleCount(8); // reset count on switch
+              }}
+            />
             <View style={{ width: 12 }} />
             <CoinBadge />
           </View>
@@ -71,12 +88,8 @@ export default function StyleScreen() {
         {filteredList.length > 0 ? (
           <FlatList
             data={filteredList.slice(0, visibleCount)}
-            renderItem={({ item, index }) => (
-              <Animated.View 
-                entering={FadeInDown.delay(150 + index * 50).duration(600)}
-              >
-                <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
-              </Animated.View>
+            renderItem={({ item }) => (
+              <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
             )}
             keyExtractor={(item) => item.uri}
             numColumns={2}
@@ -84,6 +97,10 @@ export default function StyleScreen() {
             showsVerticalScrollIndicator={false}
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
+            initialNumToRender={8}
+            maxToRenderPerBatch={10}
+            windowSize={5}
+            removeClippedSubviews={true}
           />
         ) : (
           <View style={styles.emptyContainer}>
@@ -95,7 +112,7 @@ export default function StyleScreen() {
         )}
       </LinearGradient>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -147,4 +164,4 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
   },
-})
+});
