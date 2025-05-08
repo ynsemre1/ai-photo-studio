@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,67 +14,72 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
-} from "react-native"
-import { signInWithEmailAndPassword, signOut, sendEmailVerification } from "firebase/auth"
-import { auth } from "../../src/firebase/config"
-import { router } from "expo-router"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { useGoogleLogin } from "../../src/firebase/auth/googleLogin"
-import { loginWithApple } from "../../src/firebase/auth/appleLogin"
-import { FontAwesome } from "@expo/vector-icons"
-import { AntDesign, Feather } from "@expo/vector-icons"
-import { useTheme } from "../../src/context/ThemeContext"
-import { getErrorMessage } from "../../src/utils/getErrorMessage"
-import { syncGeneratedImagesFromStorage } from "../../src/utils/saveGeneratedImage"
-import { LinearGradient } from "expo-linear-gradient"
+} from "react-native";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  sendEmailVerification,
+} from "firebase/auth";
+import { auth } from "../../src/firebase/config";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGoogleLogin } from "../../src/firebase/auth/googleLogin";
+import { loginWithApple } from "../../src/firebase/auth/appleLogin";
+import { FontAwesome } from "@expo/vector-icons";
+import { AntDesign, Feather } from "@expo/vector-icons";
+import { useTheme } from "../../src/context/ThemeContext";
+import { getErrorMessage } from "../../src/utils/getErrorMessage";
+import { syncGeneratedImagesFromStorage } from "../../src/utils/saveGeneratedImage";
+import { LinearGradient } from "expo-linear-gradient";
+import LoadingAnimation from "../../src/components/LoadingAnimation";
 
-const { width } = Dimensions.get("window")
+const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
-  const { colors, scheme } = useTheme()
+  const { colors, scheme } = useTheme();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [secureTextEntry, setSecureTextEntry] = useState(true)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
 
-  const { promptAsync: promptGoogleLogin } = useGoogleLogin()
+  const { promptAsync: promptGoogleLogin } = useGoogleLogin();
 
   useEffect(() => {
     const loadRememberedData = async () => {
-      const savedEmail = await AsyncStorage.getItem("email")
-      const savedPassword = await AsyncStorage.getItem("password")
+      const savedEmail = await AsyncStorage.getItem("email");
+      const savedPassword = await AsyncStorage.getItem("password");
 
       if (savedEmail && savedPassword) {
-        setEmail(savedEmail)
-        setPassword(savedPassword)
-        setRememberMe(true)
+        setEmail(savedEmail);
+        setPassword(savedPassword);
+        setRememberMe(true);
       }
-    }
-    loadRememberedData()
-  }, [])
+    };
+    loadRememberedData();
+  }, []);
 
   const handleLogin = async () => {
     if (!email.trim()) {
-      Alert.alert("Missing Information", "Please enter your email address")
-      return
+      Alert.alert("Missing Information", "Please enter your email address");
+      return;
     }
 
     if (!password) {
-      Alert.alert("Missing Information", "Please enter your password")
-      return
+      Alert.alert("Missing Information", "Please enter your password");
+      return;
     }
 
     try {
-      setLoading(true)
-      await signInWithEmailAndPassword(auth, email, password)
+      setLoading(true);
+      await signInWithEmailAndPassword(auth, email, password);
 
-      const currentUser = auth.currentUser
+      const currentUser = auth.currentUser;
 
       if (currentUser && !currentUser.emailVerified) {
-        const userToVerify = auth.currentUser
-        await signOut(auth)
+        const userToVerify = auth.currentUser;
+        await signOut(auth);
 
         Alert.alert(
           "Email Verification Required",
@@ -86,68 +91,74 @@ export default function LoginScreen() {
               onPress: async () => {
                 try {
                   if (userToVerify) {
-                    await sendEmailVerification(userToVerify)
-                    Alert.alert("Sent", "Verification email has been sent again.")
+                    await sendEmailVerification(userToVerify);
+                    Alert.alert(
+                      "Sent",
+                      "Verification email has been sent again."
+                    );
                   } else {
-                    Alert.alert("Error", "User information not found.")
+                    Alert.alert("Error", "User information not found.");
                   }
                 } catch (err) {
-                  Alert.alert("Error", "Could not send email.")
-                  console.error(err)
+                  Alert.alert("Error", "Could not send email.");
+                  console.error(err);
                 }
               },
             },
           ],
-          { cancelable: true },
-        )
+          { cancelable: true }
+        );
 
-        return
+        return;
       }
 
       if (rememberMe) {
-        await AsyncStorage.setItem("email", email)
-        await AsyncStorage.setItem("password", password)
+        await AsyncStorage.setItem("email", email);
+        await AsyncStorage.setItem("password", password);
       } else {
-        await AsyncStorage.removeItem("email")
-        await AsyncStorage.removeItem("password")
+        await AsyncStorage.removeItem("email");
+        await AsyncStorage.removeItem("password");
       }
 
       if (currentUser?.uid) {
-        await syncGeneratedImagesFromStorage(currentUser.uid)
+        await syncGeneratedImagesFromStorage(currentUser.uid);
       }
 
-      router.replace("/")
+      router.replace("/");
     } catch (error: any) {
-      Alert.alert("Login Error", getErrorMessage(error))
+      Alert.alert("Login Error", getErrorMessage(error));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleLogin = async () => {
     try {
-      setLoading(true)
-      await promptGoogleLogin()
+      setLoading(true);
+      await promptGoogleLogin();
     } catch (error) {
-      Alert.alert("Google Login Error", getErrorMessage(error))
+      Alert.alert("Google Login Error", getErrorMessage(error));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleAppleLogin = async () => {
     try {
-      setLoading(true)
-      await loginWithApple()
+      setLoading(true);
+      await loginWithApple();
     } catch (error) {
-      Alert.alert("Apple Login Error", getErrorMessage(error))
+      Alert.alert("Apple Login Error", getErrorMessage(error));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <LinearGradient
         colors={
           scheme === "dark"
@@ -156,25 +167,61 @@ export default function LoginScreen() {
         }
         style={styles.gradient}
       >
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <TouchableOpacity 
-            style={styles.backButton} 
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        >
+          <TouchableOpacity
+            style={styles.backButton}
             onPress={() => router.back()}
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
           >
             <Feather name="arrow-left" size={24} color={colors.text.primary} />
           </TouchableOpacity>
-          
+
           <View style={styles.header}>
-            <Text style={[styles.headerText, { color: colors.text.primary }]}>Welcome Back</Text>
-            <Text style={[styles.headerSubtext, { color: colors.text.secondary }]}>Sign in to continue</Text>
+            <Text style={[styles.headerText, { color: colors.text.primary }]}>
+              Welcome Back
+            </Text>
+            <Text
+              style={[styles.headerSubtext, { color: colors.text.secondary }]}
+            >
+              Sign in to continue
+            </Text>
           </View>
 
-          <View style={[styles.formArea, { backgroundColor: scheme === "dark" ? colors.surface[100] : colors.bg.DEFAULT }]}>
+          <View
+            style={[
+              styles.formArea,
+              {
+                backgroundColor:
+                  scheme === "dark" ? colors.surface[100] : colors.bg.DEFAULT,
+              },
+            ]}
+          >
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Email Address</Text>
-              <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
-                <AntDesign name="mail" size={20} color={colors.text.secondary} style={styles.inputIcon} />
+              <Text
+                style={[styles.inputLabel, { color: colors.text.secondary }]}
+              >
+                Email Address
+              </Text>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  {
+                    backgroundColor:
+                      scheme === "dark"
+                        ? colors.bg.DEFAULT
+                        : colors.surface[100],
+                  },
+                ]}
+              >
+                <AntDesign
+                  name="mail"
+                  size={20}
+                  color={colors.text.secondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
                   placeholder="Enter your email"
@@ -188,9 +235,28 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel, { color: colors.text.secondary }]}>Password</Text>
-              <View style={[styles.inputWrapper, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}>
-                <AntDesign name="lock" size={20} color={colors.text.secondary} style={styles.inputIcon} />
+              <Text
+                style={[styles.inputLabel, { color: colors.text.secondary }]}
+              >
+                Password
+              </Text>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  {
+                    backgroundColor:
+                      scheme === "dark"
+                        ? colors.bg.DEFAULT
+                        : colors.surface[100],
+                  },
+                ]}
+              >
+                <AntDesign
+                  name="lock"
+                  size={20}
+                  color={colors.text.secondary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={[styles.input, { color: colors.text.primary }]}
                   placeholder="Enter your password"
@@ -199,8 +265,15 @@ export default function LoginScreen() {
                   onChangeText={setPassword}
                   secureTextEntry={secureTextEntry}
                 />
-                <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.eyeIcon}>
-                  <AntDesign name={secureTextEntry ? "eyeo" : "eye"} size={20} color={colors.text.secondary} />
+                <TouchableOpacity
+                  onPress={() => setSecureTextEntry(!secureTextEntry)}
+                  style={styles.eyeIcon}
+                >
+                  <AntDesign
+                    name={secureTextEntry ? "eyeo" : "eye"}
+                    size={20}
+                    color={colors.text.secondary}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -216,67 +289,150 @@ export default function LoginScreen() {
                   }}
                   thumbColor={rememberMe ? colors.success.DEFAULT : "#f4f3f4"}
                 />
-                <Text style={[styles.checkboxLabel, { color: colors.text.primary }]}>Remember Me</Text>
+                <Text
+                  style={[styles.checkboxLabel, { color: colors.text.primary }]}
+                >
+                  Remember Me
+                </Text>
               </View>
 
-              <TouchableOpacity onPress={() => router.push("/(auth)/forgot-password")}>
-                <Text style={[styles.forgotText, { color: colors.primary.DEFAULT }]}>Forgot Password?</Text>
+              <TouchableOpacity
+                onPress={() => router.push("/(auth)/forgot-password")}
+              >
+                <Text
+                  style={[styles.forgotText, { color: colors.primary.DEFAULT }]}
+                >
+                  Forgot Password?
+                </Text>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: colors.primary.DEFAULT }]}
+              style={[
+                styles.button,
+                { backgroundColor: colors.primary.DEFAULT },
+              ]}
               onPress={handleLogin}
               disabled={loading}
               activeOpacity={0.8}
             >
               {loading ? (
-                <ActivityIndicator color={colors.text.inverse} />
+                <LoadingAnimation
+                  source={require("../../src/assets/loading-button.json")}
+                  size={25}
+                />
               ) : (
                 <>
-                  <Text style={[styles.buttonText, { color: colors.text.inverse }]}>Sign In</Text>
-                  <Feather name="log-in" size={20} color={colors.text.inverse} />
+                  <Text
+                    style={[styles.buttonText, { color: colors.text.inverse }]}
+                  >
+                    Sign In
+                  </Text>
+                  <Feather
+                    name="log-in"
+                    size={20}
+                    color={colors.text.inverse}
+                  />
                 </>
               )}
             </TouchableOpacity>
 
             <View style={styles.divider}>
-              <View style={[styles.dividerLine, { backgroundColor: colors.text.secondary }]} />
-              <Text style={[styles.dividerText, { color: colors.text.secondary }]}>or continue with</Text>
-              <View style={[styles.dividerLine, { backgroundColor: colors.text.secondary }]} />
+              <View
+                style={[
+                  styles.dividerLine,
+                  { backgroundColor: colors.text.secondary },
+                ]}
+              />
+              <Text
+                style={[styles.dividerText, { color: colors.text.secondary }]}
+              >
+                or continue with
+              </Text>
+              <View
+                style={[
+                  styles.dividerLine,
+                  { backgroundColor: colors.text.secondary },
+                ]}
+              />
             </View>
 
             <View style={styles.socialRow}>
               <TouchableOpacity
                 onPress={handleGoogleLogin}
-                style={[styles.socialButton, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}
+                style={[
+                  styles.socialButton,
+                  {
+                    backgroundColor:
+                      scheme === "dark"
+                        ? colors.bg.DEFAULT
+                        : colors.surface[100],
+                  },
+                ]}
                 activeOpacity={0.8}
               >
                 <FontAwesome name="google" size={20} color="#DB4437" />
-                <Text style={[styles.socialButtonText, { color: colors.text.primary }]}>Google</Text>
+                <Text
+                  style={[
+                    styles.socialButtonText,
+                    { color: colors.text.primary },
+                  ]}
+                >
+                  Google
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleAppleLogin}
-                style={[styles.socialButton, { backgroundColor: scheme === "dark" ? colors.bg.DEFAULT : colors.surface[100] }]}
+                style={[
+                  styles.socialButton,
+                  {
+                    backgroundColor:
+                      scheme === "dark"
+                        ? colors.bg.DEFAULT
+                        : colors.surface[100],
+                  },
+                ]}
                 activeOpacity={0.8}
               >
-                <AntDesign name="apple1" size={20} color={colors.text.primary} />
-                <Text style={[styles.socialButtonText, { color: colors.text.primary }]}>Apple</Text>
+                <AntDesign
+                  name="apple1"
+                  size={20}
+                  color={colors.text.primary}
+                />
+                <Text
+                  style={[
+                    styles.socialButtonText,
+                    { color: colors.text.primary },
+                  ]}
+                >
+                  Apple
+                </Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.footer}>
-              <Text style={[styles.registerText, { color: colors.text.secondary }]}>Don't have an account?</Text>
+              <Text
+                style={[styles.registerText, { color: colors.text.secondary }]}
+              >
+                Don't have an account?
+              </Text>
               <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
-                <Text style={[styles.registerLink, { color: colors.primary.DEFAULT }]}>Sign Up</Text>
+                <Text
+                  style={[
+                    styles.registerLink,
+                    { color: colors.primary.DEFAULT },
+                  ]}
+                >
+                  Sign Up
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </LinearGradient>
     </KeyboardAvoidingView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -288,7 +444,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 20,
     zIndex: 10,
@@ -431,4 +587,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-})
+});
