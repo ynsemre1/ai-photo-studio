@@ -20,7 +20,6 @@ export const syncGeneratedImagesFromStorage = async (uid: string) => {
     const dirInfo = await FileSystem.getInfoAsync(LOCAL_DIR);
     if (!dirInfo.exists) {
       await FileSystem.makeDirectoryAsync(LOCAL_DIR, { intermediates: true });
-      console.log("Local klasör oluşturuldu:", LOCAL_DIR);
     }
 
     const imagesRef = ref(storage, `generatedImages/${uid}`);
@@ -34,9 +33,7 @@ export const syncGeneratedImagesFromStorage = async (uid: string) => {
       const fileExists = await FileSystem.getInfoAsync(localPath);
       if (!fileExists.exists) {
         await FileSystem.downloadAsync(url, localPath);
-        console.log("İndirildi:", localPath);
       } else {
-        console.log("Zaten var:", localPath);
       }
 
       return localPath;
@@ -45,11 +42,9 @@ export const syncGeneratedImagesFromStorage = async (uid: string) => {
     const localUris = await Promise.all(downloadPromises);
 
     await AsyncStorage.setItem(storageKey, JSON.stringify(localUris));
-    console.log("Firebase Storage'dan tüm fotoğraflar eşitlendi:", localUris.length);
 
     return localUris;
   } catch (err) {
-    console.log("Firebase Storage eşitleme hatası:", err);
     return [];
   }
 };
@@ -60,14 +55,12 @@ export const saveGeneratedImage = async (url: string, uid: string) => {
     const dirInfo = await FileSystem.getInfoAsync(LOCAL_DIR);
     if (!dirInfo.exists) {
       await FileSystem.makeDirectoryAsync(LOCAL_DIR, { intermediates: true });
-      console.log("Local klasör oluşturuldu:", LOCAL_DIR);
     }
 
     const filename = `img_${Date.now()}.png`;
     const localPath = LOCAL_DIR + filename;
 
     const download = await FileSystem.downloadAsync(url, localPath);
-    console.log("Yeni fotoğraf indirildi:", download.uri);
 
     const storageKey = await getStorageKey(uid);
     const json = await AsyncStorage.getItem(storageKey);
@@ -76,10 +69,8 @@ export const saveGeneratedImage = async (url: string, uid: string) => {
     const newList = [download.uri, ...oldList];
     await AsyncStorage.setItem(storageKey, JSON.stringify(newList));
 
-    console.log("AsyncStorage güncellendi:", storageKey);
     return download.uri;
   } catch (err) {
-    console.log("Fotoğraf kaydetme hatası:", err);
     return null;
   }
 };
