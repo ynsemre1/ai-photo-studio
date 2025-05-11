@@ -115,7 +115,7 @@ export default function StyleBox({ uri, value, onPress, size }: Props) {
   };
 
   return (
-    <Animated.View entering={FadeIn.duration(500)} style={animatedStyle}>
+    <Animated.View style={animatedStyle}>
       <TouchableOpacity
         onPress={handlePress}
         style={[

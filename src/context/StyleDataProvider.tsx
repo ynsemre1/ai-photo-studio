@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { collection, onSnapshot } from "firebase/firestore";
+import * as FileSystem from "expo-file-system";
+import { collection, getDocs, query } from "firebase/firestore";
 import { db, storage, auth } from "../firebase/config";
 import { getDownloadURL, ref as storageRef } from "firebase/storage";
 
@@ -19,102 +20,97 @@ type StyleData = {
 const StyleContext = createContext<StyleData | null>(null);
 export const useStyleData = () => useContext(StyleContext);
 
-export const StyleDataProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+const CACHE_KEY = "styleData";
+const LAST_SYNC_KEY = "lastSync";
+const SYNC_INTERVAL = 1000 * 60 * 60 * 24; // 24 saat
+
+export const StyleDataProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<StyleData>({
     style: [],
     car: [],
     professional: [],
   });
 
-  // Load cached data on first mount
   useEffect(() => {
     const loadCache = async () => {
-      const cached = await AsyncStorage.getItem("styleData");
-      if (cached) {
-        setData(JSON.parse(cached));
-      }
+      const cached = await AsyncStorage.getItem(CACHE_KEY);
+      if (cached) setData(JSON.parse(cached));
     };
-    loadCache();
-  }, []);
 
-  useEffect(() => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
+    const syncData = async () => {
+      const lastSync = await AsyncStorage.getItem(LAST_SYNC_KEY);
+      const now = Date.now();
 
-    const unsubscribeFns: Array<() => void> = [];
-    const types = ["style", "car", "professional"] as const;
+      if (lastSync && now - Number(lastSync) < SYNC_INTERVAL) {
+        return;
+      }
 
-    types.forEach((type) => {
-      const refCol = collection(db, type);
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
 
-      const unsubscribe = onSnapshot(refCol, async (snap) => {
-        console.log("🔥 Firestore update detected for:", type);
+      const types = ["style", "car", "professional"] as const;
+      const updatedCache: StyleData = { style: [], car: [], professional: [] };
 
-        const enrichedData = await Promise.all(
-          snap.docs.map(async (doc) => {
-            const docData = doc.data();
-            const fileName = docData.file_name;
-            const isGendered = docData.gender === true;
+      for (const type of types) {
+        const refCol = collection(db, type);
+        const snap = await getDocs(query(refCol));
 
-            if (!fileName || !docData.value) return null;
+        if (!snap.empty) {
+          const enrichedData = await Promise.all(
+            snap.docs.map(async (doc) => {
+              const docData = doc.data();
+              const fileName = docData.file_name;
+              const isGendered = docData.gender === true;
 
-            if (isGendered) {
+              if (!fileName || !docData.value) return null;
+
+              if (isGendered) {
+                try {
+                  const maleUri = await getOrDownloadImage(`styles/${type}/male/${fileName}`, "male");
+                  const femaleUri = await getOrDownloadImage(`styles/${type}/female/${fileName}`, "female");
+                  return [
+                    { value: docData.value, uri: maleUri, gender: "male" },
+                    { value: docData.value, uri: femaleUri, gender: "female" },
+                  ];
+                } catch {
+                  return null;
+                }
+              }
+
               try {
-                const malePath = `styles/${type}/male/${fileName}`;
-                const femalePath = `styles/${type}/female/${fileName}`;
-
-                const [maleUri, femaleUri] = await Promise.all([
-                  getDownloadURL(storageRef(storage, malePath)),
-                  getDownloadURL(storageRef(storage, femalePath)),
-                ]);
-
-                return [
-                  { value: docData.value, uri: maleUri, gender: "male" },
-                  { value: docData.value, uri: femaleUri, gender: "female" },
-                ];
-              } catch (err) {
-                console.log("🚫 Gendered URI fetch failed:", fileName);
+                const uri = await getOrDownloadImage(`styles/${type}/${fileName}`);
+                return { value: docData.value, uri };
+              } catch {
                 return null;
               }
-            }
+            })
+          );
 
-            // gender yoksa (veya false ise) klasik tek path
-            try {
-              const path = `styles/${type}/${fileName}`;
-              const uri = await getDownloadURL(storageRef(storage, path));
-              return { value: docData.value, uri };
-            } catch (err) {
-              console.log("🚫 URI fetch failed:", fileName);
-              return null;
-            }
-          })
-        );
+          const flattened = enrichedData.flat().filter(Boolean) as StyleItem[];
+          updatedCache[type] = flattened;
+        }
+      }
 
-        const flattened = enrichedData.flat().filter(Boolean) as StyleItem[];
-
-        setData((prev) => ({
-          ...prev,
-          [type]: flattened,
-        }));
-
-        const newCache = {
-          ...data,
-          [type]: flattened,
-        };
-
-        await AsyncStorage.setItem("styleData", JSON.stringify(newCache));
-      });
-
-      unsubscribeFns.push(unsubscribe);
-    });
-
-    return () => {
-      unsubscribeFns.forEach((unsub) => unsub());
+      setData(updatedCache);
+      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(updatedCache));
+      await AsyncStorage.setItem(LAST_SYNC_KEY, now.toString());
     };
+
+    const getOrDownloadImage = async (storagePath: string, gender?: "male" | "female") => {
+      const fileName = storagePath.split("/").pop();
+      const genderPrefix = gender ? `${gender}_` : "";
+      const localPath = `${FileSystem.cacheDirectory}${genderPrefix}${fileName}`;
+
+      const fileInfo = await FileSystem.getInfoAsync(localPath);
+      if (!fileInfo.exists) {
+        const remoteUri = await getDownloadURL(storageRef(storage, storagePath));
+        await FileSystem.downloadAsync(remoteUri, localPath);
+      }
+
+      return localPath;
+    };
+
+    loadCache().then(syncData);
   }, []);
 
   return <StyleContext.Provider value={data}>{children}</StyleContext.Provider>;

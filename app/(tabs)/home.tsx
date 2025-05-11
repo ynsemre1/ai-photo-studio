@@ -214,14 +214,28 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.uri}
           contentContainerStyle={styles.gridContainer}
           columnWrapperStyle={{ justifyContent: "center" }}
+          initialNumToRender={12} // İlk renderda daha fazla eleman getirir, boş ekran engellenir
+          maxToRenderPerBatch={16} // Her batch'te daha fazla eleman yüklenir, scroll daha akıcı olur
+          windowSize={7} // Görünen ekran öncesi ve sonrası daha fazla eleman bellekte tutulur
+          removeClippedSubviews={true} // Görünmeyen elemanlar bellekten atılır
           onEndReached={loadMoreStyles}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0.4} // Scroll’un %40’ına gelince yeni eleman yüklemeye başlar
           ListHeaderComponent={headerComponent}
           showsVerticalScrollIndicator={false}
+          ListFooterComponent={
+            visibleStyles < allStyles.length ? (
+              <View style={{ paddingVertical: 20 }}>
+                <Text style={{ textAlign: "center" }}>
+                  Loading more styles...
+                </Text>
+              </View>
+            ) : null
+          }
           renderItem={({ item }) => (
             <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
           )}
         />
+
         <ImagePreviewModal
           visible={!!previewUri}
           uri={previewUri!}

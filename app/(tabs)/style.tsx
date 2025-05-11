@@ -1,25 +1,19 @@
 "use client";
-
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
-  Text,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
-  Dimensions,
+  Text,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
 import { useTheme } from "../../src/context/ThemeContext";
 import GenderSwitch from "../../src/components/GenderSwitch";
-import CoinBadge from "../../src/components/CoinBadge";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-
-const screenWidth = Dimensions.get("window").width;
 
 export default function StyleScreen() {
   const router = useRouter();
@@ -29,8 +23,21 @@ export default function StyleScreen() {
   const [selectedGender, setSelectedGender] = useState<"male" | "female">("male");
   const [visibleCount, setVisibleCount] = useState(16);
 
-  const filteredList =
-    (styleData?.style || []).filter((item) => item.gender === selectedGender) || [];
+  if (!styleData) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading styles...</Text>
+      </View>
+    );
+  }
+
+  const filteredList = (styleData.style || []).filter(
+    (item) => item.gender === selectedGender
+  );
+
+  const handlePress = (value: string) => {
+    router.push({ pathname: "/upload-image", params: { value } });
+  };
 
   const loadMore = () => {
     if (visibleCount < filteredList.length) {
@@ -38,9 +45,25 @@ export default function StyleScreen() {
     }
   };
 
-  const handlePress = (value: string) => {
-    router.push({ pathname: "/upload-image", params: { value } });
-  };
+  const memoizedFlatList = useMemo(() => (
+    <FlatList
+      key={selectedGender} // Gender değişince FlatList baştan render olur
+      data={filteredList.slice(0, visibleCount)}
+      renderItem={({ item }) => (
+        <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+      )}
+      keyExtractor={(item, index) => `${selectedGender}-${index}`}
+      numColumns={2}
+      contentContainerStyle={styles.gridContainer}
+      showsVerticalScrollIndicator={false}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.4}
+      initialNumToRender={12}
+      maxToRenderPerBatch={16}
+      windowSize={7}
+      removeClippedSubviews={true}
+    />
+  ), [filteredList, selectedGender, visibleCount]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg.DEFAULT }]}>
@@ -52,61 +75,32 @@ export default function StyleScreen() {
         }
         style={{ flex: 1 }}
       >
-        {/* Header with soft fade */}
         <Animated.View entering={FadeIn.duration(250)} style={styles.headerContainer}>
           <Text style={[styles.headerText, { color: colors.text.primary }]}>
             Style Gallery
           </Text>
           <Text style={[styles.headerSubtext, { color: colors.text.secondary }]}>
-            Choose a style for your transformation
+            Select styles by gender
           </Text>
         </Animated.View>
 
-        {/* Controls section with fade */}
         <Animated.View entering={FadeIn.duration(250)} style={styles.controlsContainer}>
-          <View
-            style={[
-              styles.controlsWrapper,
-              {
-                backgroundColor: scheme === "dark" ? colors.surface[100] : colors.primary[100],
-                borderColor: scheme === "dark" ? colors.primary[800] : colors.primary[200],
-              },
-            ]}
-          >
-            <GenderSwitch
-              selected={selectedGender}
-              onChange={(gender) => {
-                setSelectedGender(gender);
-                setVisibleCount(8); // reset count on switch
-              }}
-            />
-            <View style={{ width: 12 }} />
-            <CoinBadge />
-          </View>
+          <GenderSwitch
+            selected={selectedGender}
+            onChange={(gender) => {
+              setSelectedGender(gender);
+              setVisibleCount(16); // Gender değişiminde listeyi başa sar
+            }}
+          />
         </Animated.View>
 
         {filteredList.length > 0 ? (
-          <FlatList
-            data={filteredList.slice(0, visibleCount)}
-            renderItem={({ item }) => (
-              <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
-            )}
-            keyExtractor={(item) => item.uri}
-            numColumns={2}
-            contentContainerStyle={styles.gridContainer}
-            showsVerticalScrollIndicator={false}
-            onEndReached={loadMore}
-            onEndReachedThreshold={0.5}
-            initialNumToRender={8}
-            maxToRenderPerBatch={10}
-            windowSize={5}
-            removeClippedSubviews={true}
-          />
+          memoizedFlatList
         ) : (
           <View style={styles.emptyContainer}>
             <Feather name="image" size={60} color={colors.text.secondary} />
             <Text style={[styles.emptyText, { color: colors.text.secondary }]}>
-              No styles available for {selectedGender === "male" ? "men" : "women"}
+              No styles available for {selectedGender === "male" ? "men" : "women"}.
             </Text>
           </View>
         )}
@@ -116,9 +110,9 @@ export default function StyleScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+  loadingText: { fontSize: 18 },
   headerContainer: {
     paddingTop: 20,
     paddingHorizontal: 16,
@@ -137,15 +131,6 @@ const styles = StyleSheet.create({
   controlsContainer: {
     alignItems: "center",
     marginVertical: 16,
-  },
-  controlsWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderRadius: 24,
-    borderWidth: 1,
   },
   gridContainer: {
     paddingVertical: 16,

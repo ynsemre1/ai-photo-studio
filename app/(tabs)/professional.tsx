@@ -1,11 +1,9 @@
-"use client";
 import { useState } from "react";
 import {
   View,
   FlatList,
   StyleSheet,
   Text,
-  Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
@@ -14,8 +12,6 @@ import { useTheme } from "../../src/context/ThemeContext";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-
-const screenWidth = Dimensions.get("window").width;
 
 export default function ProfessionalScreen() {
   const router = useRouter();
@@ -45,7 +41,6 @@ export default function ProfessionalScreen() {
         }
         style={{ flex: 1 }}
       >
-        {/* Soft fade for header only */}
         <Animated.View entering={FadeIn.duration(250)} style={styles.headerContainer}>
           <Text style={[styles.headerText, { color: colors.text.primary }]}>
             Professional Styles
@@ -66,10 +61,10 @@ export default function ProfessionalScreen() {
             contentContainerStyle={styles.gridContainer}
             showsVerticalScrollIndicator={false}
             onEndReached={loadMore}
-            onEndReachedThreshold={0.5}
-            initialNumToRender={8}
-            maxToRenderPerBatch={10}
-            windowSize={5}
+            onEndReachedThreshold={0.4}
+            initialNumToRender={12}
+            maxToRenderPerBatch={16}
+            windowSize={7}
             removeClippedSubviews={true}
           />
         ) : (

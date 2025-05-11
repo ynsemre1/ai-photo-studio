@@ -1,5 +1,10 @@
-"use client";
-import { View, FlatList, StyleSheet, Text, Dimensions } from "react-native";
+import { useState } from "react";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Text,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useStyleData } from "../../src/context/StyleDataProvider";
 import StyleBox from "../../src/components/StyleBox";
@@ -7,9 +12,6 @@ import { useTheme } from "../../src/context/ThemeContext";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-import { useState } from "react";
-
-const screenWidth = Dimensions.get("window").width;
 
 export default function CarScreen() {
   const router = useRouter();
@@ -39,7 +41,6 @@ export default function CarScreen() {
         }
         style={{ flex: 1 }}
       >
-        {/* Header kısmında yumuşak geçiş */}
         <Animated.View entering={FadeIn.duration(250)} style={styles.headerContainer}>
           <Text style={[styles.headerText, { color: colors.text.primary }]}>
             Car Styles
@@ -52,21 +53,19 @@ export default function CarScreen() {
         {carList.length > 0 ? (
           <FlatList
             data={carList.slice(0, visibleCount)}
-            renderItem={({ item }) =>
-              item && item.uri && item.value ? (
-                <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
-              ) : null
-            }
+            renderItem={({ item }) => (
+              <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />
+            )}
             keyExtractor={(item, index) => `car-${index}`}
             numColumns={2}
-            onEndReached={loadMore}
-            onEndReachedThreshold={0.5}
-            initialNumToRender={8}
-            maxToRenderPerBatch={10}
-            windowSize={5}
-            removeClippedSubviews={true}
             contentContainerStyle={styles.gridContainer}
             showsVerticalScrollIndicator={false}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.4}
+            initialNumToRender={12}
+            maxToRenderPerBatch={16}
+            windowSize={7}
+            removeClippedSubviews={true}
           />
         ) : (
           <View style={styles.emptyContainer}>
@@ -82,9 +81,7 @@ export default function CarScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   headerContainer: {
     paddingTop: 20,
     paddingHorizontal: 16,
