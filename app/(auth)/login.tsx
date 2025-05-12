@@ -121,7 +121,7 @@ export default function LoginScreen() {
       }
 
       if (currentUser?.uid) {
-        await syncGeneratedImagesFromStorage(currentUser.uid);
+        syncGeneratedImagesFromStorage(currentUser.uid);
       }
 
       router.replace("/");

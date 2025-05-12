@@ -214,8 +214,8 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.uri}
           contentContainerStyle={styles.gridContainer}
           columnWrapperStyle={{ justifyContent: "center" }}
-          initialNumToRender={12} // İlk renderda daha fazla eleman getirir, boş ekran engellenir
-          maxToRenderPerBatch={16} // Her batch'te daha fazla eleman yüklenir, scroll daha akıcı olur
+          initialNumToRender={8} // İlk renderda daha fazla eleman getirir, boş ekran engellenir
+          maxToRenderPerBatch={10} // Her batch'te daha fazla eleman yüklenir, scroll daha akıcı olur
           windowSize={7} // Görünen ekran öncesi ve sonrası daha fazla eleman bellekte tutulur
           removeClippedSubviews={true} // Görünmeyen elemanlar bellekten atılır
           onEndReached={loadMoreStyles}
@@ -226,7 +226,6 @@ export default function HomeScreen() {
             visibleStyles < allStyles.length ? (
               <View style={{ paddingVertical: 20 }}>
                 <Text style={{ textAlign: "center" }}>
-                  Loading more styles...
                 </Text>
               </View>
             ) : null
