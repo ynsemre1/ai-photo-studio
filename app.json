@@ -3,7 +3,7 @@
     "name": "AI Photo Studio",
     "slug": "gpt-creative-studio",
     "scheme": "aiphotostudio",
-    "version": "1.1.7",
+    "version": "1.1.8",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
