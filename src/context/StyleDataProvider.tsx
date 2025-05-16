@@ -22,7 +22,7 @@ export const useStyleData = () => useContext(StyleContext);
 
 const CACHE_KEY = "styleData";
 const LAST_SYNC_KEY = "lastSync";
-const SYNC_INTERVAL = 1000 * 60 * 60 * 24; // 24 saat
+const SYNC_INTERVAL = 1000 * 60 * 60 * 24; // 24 hours
 
 export const StyleDataProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<StyleData>({
@@ -56,42 +56,48 @@ export const StyleDataProvider = ({ children }: { children: React.ReactNode }) =
         const snap = await getDocs(query(refCol));
 
         if (!snap.empty) {
-          const enrichedData = await Promise.all(
-            snap.docs.map(async (doc) => {
-              const docData = doc.data();
-              const fileName = docData.file_name;
-              const isGendered = docData.gender === true;
+          for (const doc of snap.docs) {
+            const docData = doc.data();
+            const fileName = docData.file_name;
+            const isGendered = docData.gender === true;
 
-              if (!fileName || !docData.value) return null;
+            if (!fileName || !docData.value) continue;
 
+            try {
               if (isGendered) {
-                try {
-                  const maleUri = await getOrDownloadImage(`styles/${type}/male/${fileName}`, "male");
-                  const femaleUri = await getOrDownloadImage(`styles/${type}/female/${fileName}`, "female");
-                  return [
-                    { value: docData.value, uri: maleUri, gender: "male" },
-                    { value: docData.value, uri: femaleUri, gender: "female" },
-                  ];
-                } catch {
-                  return null;
-                }
-              }
+                const maleUri = await getOrDownloadImage(`styles/${type}/male/${fileName}`, "male");
+                const femaleUri = await getOrDownloadImage(`styles/${type}/female/${fileName}`, "female");
 
-              try {
+                const maleItem = { value: docData.value, uri: maleUri, gender: "male" as const};
+                const femaleItem = { value: docData.value, uri: femaleUri, gender: "female" as const};
+
+                updatedCache[type].push(maleItem, femaleItem);
+
+                // update UI incrementally
+                setData((prev) => ({
+                  ...prev,
+                  [type]: [...prev[type], maleItem, femaleItem],
+                }));
+              } else {
                 const uri = await getOrDownloadImage(`styles/${type}/${fileName}`);
-                return { value: docData.value, uri };
-              } catch {
-                return null;
-              }
-            })
-          );
+                const item = { value: docData.value, uri };
 
-          const flattened = enrichedData.flat().filter(Boolean) as StyleItem[];
-          updatedCache[type] = flattened;
+                updatedCache[type].push(item);
+
+                // update UI incrementally
+                setData((prev) => ({
+                  ...prev,
+                  [type]: [...prev[type], item],
+                }));
+              }
+            } catch (e) {
+              console.log("❌ Image download error:", e);
+              continue;
+            }
+          }
         }
       }
 
-      setData(updatedCache);
       await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(updatedCache));
       await AsyncStorage.setItem(LAST_SYNC_KEY, now.toString());
     };
