@@ -49,7 +49,7 @@ export const syncGeneratedImagesFromStorage = async (uid: string) => {
   }
 };
 
-// Yeni üretilen bir fotoğrafı local'e kaydeder
+// New image URL save to local storage
 export const saveGeneratedImage = async (url: string, uid: string) => {
   try {
     const dirInfo = await FileSystem.getInfoAsync(LOCAL_DIR);
@@ -75,7 +75,7 @@ export const saveGeneratedImage = async (url: string, uid: string) => {
   }
 };
 
-// Local'den en güncel fotoğraf listesini getirir
+// Sync Local storage with Firebase storage
 export const getRecentGeneratedImages = async (uid: string): Promise<string[]> => {
   const storageKey = await getStorageKey(uid);
   const json = await AsyncStorage.getItem(storageKey);

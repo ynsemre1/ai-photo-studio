@@ -47,7 +47,7 @@ export default function StyleScreen() {
 
   const memoizedFlatList = useMemo(() => (
     <FlatList
-      key={selectedGender} // Gender değişince FlatList baştan render olur
+      key={selectedGender}
       data={filteredList.slice(0, visibleCount)}
       renderItem={({ item }) => (
         <StyleBox uri={item.uri} value={item.value} onPress={handlePress} />

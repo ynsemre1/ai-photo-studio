@@ -1,7 +1,7 @@
 import { storage, functions } from "../firebase/config";
 import { ref, uploadBytes } from "firebase/storage";
 import { httpsCallable } from "firebase/functions";
-import { saveGeneratedImage } from "./saveGeneratedImage"; // ✅ local kayıt fonksiyonu
+import { saveGeneratedImage } from "./saveGeneratedImage";
 import { getAuth } from "firebase/auth";
 
 /**

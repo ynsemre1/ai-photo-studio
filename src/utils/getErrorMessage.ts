@@ -1,15 +1,15 @@
 export function getErrorMessage(error: any): string {
-    // Firebase hataları
+    // Firebase error
     if (error?.code?.startsWith("auth/")) {
       return getFirebaseAuthErrorMessage(error.code);
     }
   
-    // Network hatası
+    // Network error
     if (error?.message?.includes("Network request failed")) {
       return "İnternet bağlantısı yok.";
     }
   
-    // Özel uygulama hataları
+    // Private application error
     if (typeof error === "string") {
       return error;
     }
@@ -21,7 +21,7 @@ export function getErrorMessage(error: any): string {
     return "Beklenmeyen bir hata oluştu.";
   }
   
-  // 🔁 Firebase hataları için ek
+  // Firebase authentication error messages
   function getFirebaseAuthErrorMessage(code: string): string {
     switch (code) {
       case "auth/invalid-email":

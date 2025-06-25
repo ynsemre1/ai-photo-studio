@@ -8,6 +8,7 @@ import Animated, { FadeInDown } from "react-native-reanimated"
 const screenWidth = Dimensions.get("window").width
 
 const coinPackages = [
+  //TODO: After test, delete here
   { id: "1", amount: 100, price: "₺19,99", popular: false },
   { id: "2", amount: 250, price: "₺39,99", popular: true },
   { id: "3", amount: 500, price: "₺69,99", popular: false },

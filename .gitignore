@@ -86,3 +86,5 @@ config.ts
 config.tsx
 apikeys.json
 apikeys.tsÏ
+
+.fake

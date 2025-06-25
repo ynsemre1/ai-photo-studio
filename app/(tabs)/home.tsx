@@ -34,8 +34,7 @@ export default function HomeScreen() {
   const [recentImages, setRecentImages] = useState<string[]>([]);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const [visibleStyles, setVisibleStyles] = useState(16);
-  const [hasAnimated, setHasAnimated] = useState(false); // 🧠 Animasyonun sadece 1 kez çalışmasını kontrol eder
-
+  const [hasAnimated, setHasAnimated] = useState(false);
   useEffect(() => {
     setHasAnimated(true);
   }, []);

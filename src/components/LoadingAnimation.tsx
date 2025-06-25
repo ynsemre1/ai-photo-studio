@@ -17,7 +17,7 @@ export default function LoadingAnimation({ source, size = 40 }: Props) {
         autoPlay
         loop
         style={{
-          width: size * 2.5, // büyük çiz
+          width: size * 2.5,
           height: size * 2.5,
         }}
       />

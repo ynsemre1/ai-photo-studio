@@ -1,5 +1,5 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { useTheme } from "../../context/ThemeContext"; // Uyumlu hale getirdik
+import { useTheme } from "../../context/ThemeContext";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import Animated, {
   FadeIn,
@@ -21,7 +21,7 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
-  const { colors, scheme } = useTheme(); // colors'ı tema üzerinden alıyoruz
+  const { colors, scheme } = useTheme(); 
   const { triggerCamera } = useUploadImage();
   const currentRouteName = state.routes[state.index].name;
   const isUploadImageScreen = currentRouteName === "upload-image";
@@ -70,14 +70,14 @@ const CustomNavBar: React.FC<BottomTabBarProps> = ({
       >
         {getIconByRouteName(
           route.name,
-          isFocused ? colors.text.inverse : colors.text.primary // Icon color changes based on focus
+          isFocused ? colors.text.inverse : colors.text.primary 
         )}
         {isFocused && label && (
           <Animated.Text
             entering={FadeIn.duration(200)}
             exiting={FadeOut.duration(200)}
             style={{
-              color: isFocused ? colors.text.inverse : colors.text.primary, // Text color change based on focus
+              color: isFocused ? colors.text.inverse : colors.text.primary, 
               fontSize: 12,
               paddingLeft: 4,
               textAlign: "center",

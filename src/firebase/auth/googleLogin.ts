@@ -5,7 +5,7 @@ import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 
 export function useGoogleLogin() {
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: "GOOGLE_CLIENT_ID", // doğru client id'yi buraya yaz
+    clientId: "GOOGLE_CLIENT_ID",
   });
 
   useEffect(() => {
