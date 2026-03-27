@@ -7,6 +7,7 @@ import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import SplashScreen from "../src/components/SplashScreen";
+import { useSessionExpired } from "../src/hooks/useSessionExpired";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,6 +15,8 @@ export default function RootLayout() {
   const router = useRouter();
   const pathname = usePathname();
   const [hasRedirected, setHasRedirected] = useState(false);
+
+  useSessionExpired();
 
   // Firebase auth kontrolü
   useEffect(() => {
