@@ -8,6 +8,7 @@ import { useTheme } from "../../src/context/ThemeContext"
 import { LinearGradient } from "expo-linear-gradient"
 import { Feather } from "@expo/vector-icons"
 import { router } from "expo-router"
+import { getErrorMessage } from "../../src/utils/getErrorMessage"
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("")
@@ -26,7 +27,7 @@ export default function ForgotPasswordScreen() {
       Alert.alert("Email Sent", "Password reset link has been sent to your email.")
       router.back()
     } catch (error: any) {
-      Alert.alert("Error", error.message)
+      Alert.alert("Error", getErrorMessage(error))
     } finally {
       setLoading(false)
     }
