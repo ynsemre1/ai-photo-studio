@@ -4,9 +4,15 @@ export function getErrorMessage(error: any): string {
       return getFirebaseAuthErrorMessage(error.code);
     }
   
-    // Network error
-    if (error?.message?.includes("Network request failed")) {
-      return "İnternet bağlantısı yok.";
+    // Network error (TypeError from fetch when offline, or Firebase network error)
+    if (
+      error instanceof TypeError ||
+      error?.message?.includes("Network request failed") ||
+      error?.message?.includes("Failed to fetch") ||
+      error?.code === "functions/unavailable" ||
+      error?.code === "functions/deadline-exceeded"
+    ) {
+      return "Ağ hatası. Lütfen internet bağlantınızı kontrol edin.";
     }
   
     // Private application error

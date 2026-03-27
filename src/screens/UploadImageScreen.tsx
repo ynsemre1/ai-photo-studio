@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { useLocalSearchParams } from "expo-router";
 import { editPhoto } from "../utils/editPhoto";
+import { getErrorMessage } from "../utils/getErrorMessage";
 import { getAuth } from "firebase/auth";
 import { Feather } from "@expo/vector-icons";
 import { useTheme } from "../../src/context/ThemeContext";
@@ -28,6 +29,7 @@ export default function UploadImageScreen() {
   const [originalUri, setOriginalUri] = useState<string | null>(null);
   const [generatedUri, setGeneratedUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { colors, scheme } = useTheme();
   const { setTriggerCamera } = useUploadImage();
 
@@ -54,6 +56,7 @@ export default function UploadImageScreen() {
 
       setOriginalUri(resized.uri);
       setGeneratedUri(null);
+      setError(null);
     }
   };
 
@@ -61,6 +64,7 @@ export default function UploadImageScreen() {
     if (!originalUri || !value) return;
     setLoading(true);
 
+    setError(null);
     try {
       const blob = await fetch(originalUri).then((r) => r.blob());
       const uid = getAuth().currentUser?.uid || "anon";
@@ -69,6 +73,7 @@ export default function UploadImageScreen() {
       setGeneratedUri(resultUrl);
     } catch (err) {
       console.log("🔥 Üretim hatası:", err);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -255,6 +260,14 @@ export default function UploadImageScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Error Message */}
+      {error && (
+        <View style={styles.errorContainer}>
+          <Feather name="alert-circle" size={18} color="#DC2626" />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
+
       {/* Action Buttons */}
       {generatedUri && (
         <View style={styles.actionContainer}>
@@ -387,6 +400,21 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#FEF2F2",
+    marginBottom: 16,
+    gap: 8,
+  },
+  errorText: {
+    color: "#DC2626",
+    fontSize: 14,
+    flex: 1,
   },
   actionContainer: {
     flexDirection: "row",
