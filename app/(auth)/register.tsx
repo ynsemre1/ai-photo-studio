@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
 } from "react-native"
-import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth"
+import { createUserWithEmailAndPassword, sendEmailVerification, signOut, updateProfile } from "firebase/auth"
 import { auth, db } from "../../src/firebase/config"
 import { doc, setDoc } from "firebase/firestore"
 import { router } from "expo-router"
@@ -60,6 +60,10 @@ export default function RegisterScreen() {
 
       const userCred = await createUserWithEmailAndPassword(auth, email, password)
       const uid = userCred.user.uid
+
+      await updateProfile(userCred.user, {
+        displayName: `${name} ${surname}`,
+      })
 
       await setDoc(doc(db, "users", uid), {
         name,
