@@ -34,6 +34,8 @@ export function getErrorMessage(error: any): string {
         return "Bu e-posta adresi zaten kullanılıyor.";
       case "auth/weak-password":
         return "Zayıf şifre. Daha güçlü bir şifre belirleyin.";
+      case "auth/too-many-requests":
+        return "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.";
       case "auth/network-request-failed":
         return "İnternet bağlantısı yok.";
       default:
